@@ -5,1337 +5,1068 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>The Autistic Savant OS — What You Don't Know But Should</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
 
-  :root {
-    --bg-deep: #020408;
-    --bg-mid: #050d18;
-    --bg-card: rgba(10,20,40,0.85);
-    --accent-blue: #3b82f6;
-    --accent-cyan: #06b6d4;
-    --accent-violet: #7c3aed;
-    --accent-pink: #ec4899;
-    --accent-amber: #f59e0b;
-    --accent-emerald: #10b981;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #475569;
-    --border: rgba(59,130,246,0.15);
-    --glow-blue: 0 0 60px rgba(59,130,246,0.3);
-    --glow-violet: 0 0 60px rgba(124,58,237,0.3);
-    --glow-cyan: 0 0 40px rgba(6,182,212,0.2);
-  }
+:root {
+  --bg-deep: #010307;
+  --bg-mid: #040c18;
+  --bg-card: rgba(8,16,36,0.9);
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-violet: #7c3aed;
+  --accent-pink: #ec4899;
+  --accent-amber: #f59e0b;
+  --accent-emerald: #10b981;
+  --accent-rose: #f43f5e;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+  --border: rgba(59,130,246,0.12);
+  --border-bright: rgba(59,130,246,0.3);
+}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg-deep);
+  color:var(--text-primary);
+  overflow-x:hidden;
+  line-height:1.7;
+}
 
-  html { scroll-behavior: smooth; }
+/* ── CANVAS BG ── */
+#canvas-bg{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;
+}
 
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg-deep);
-    color: var(--text-primary);
-    overflow-x: hidden;
-    line-height: 1.7;
-  }
+/* ── GRAIN ── */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:1;opacity:0.35;
+}
 
-  /* ── STAR FIELD ── */
-  #starfield {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 0; pointer-events: none;
-    background: radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 60% 80%, rgba(6,182,212,0.06) 0%, transparent 50%),
-                #020408;
-  }
-  #starfield canvas { position: absolute; top:0; left:0; }
+/* ── SCROLL PROGRESS ── */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,var(--accent-blue),var(--accent-violet),var(--accent-pink),var(--accent-cyan));
+  z-index:9999;transition:width 0.05s linear;
+  box-shadow:0 0 12px rgba(124,58,237,0.6);
+}
 
-  /* ── NOISE OVERLAY ── */
-  body::before {
-    content: '';
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 1; opacity: 0.4;
-  }
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:14px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(1,3,7,0.75);
+  backdrop-filter:blur(24px) saturate(180%);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:800;font-size:0.95rem;letter-spacing:-0.02em;
+  background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet),var(--accent-pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-size:200%;animation:gradShift 4s ease infinite;
+}
+.nav-pill{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(124,58,237,0.12);
+  border:1px solid rgba(124,58,237,0.25);
+  border-radius:100px;padding:6px 14px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--accent-violet);
+}
+.nav-pill .live-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent-emerald);
+  box-shadow:0 0 8px var(--accent-emerald);
+  animation:livePulse 1.5s ease infinite;
+}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.6)}}
+.nav-links{display:flex;gap:4px;list-style:none;}
+.nav-links a{
+  font-size:0.7rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--text-muted);text-decoration:none;padding:6px 10px;
+  border-radius:8px;transition:all 0.2s ease;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--accent-cyan);background:rgba(6,182,212,0.08);}
+@media(max-width:900px){.nav-links{display:none}}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
-  /* ── NAV ── */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    padding: 16px 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    background: rgba(2,4,8,0.8);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-logo {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700; font-size: 1rem;
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    letter-spacing: -0.02em;
-  }
-  .nav-links {
-    display: flex; gap: 8px; flex-wrap: wrap;
-    list-style: none;
-  }
-  .nav-links a {
-    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
-    color: var(--text-secondary); text-decoration: none; padding: 6px 12px;
-    border-radius: 6px; border: 1px solid transparent;
-    transition: all 0.2s ease;
-  }
-  .nav-links a:hover {
-    color: var(--accent-cyan); border-color: var(--border);
-    background: rgba(6,182,212,0.05);
-  }
-  @media(max-width:768px){ .nav-links { display: none; } }
+/* ── HERO ── */
+#hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:130px 24px 100px;
+  position:relative;z-index:2;overflow:hidden;
+}
+.hero-kicker{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;
+  color:var(--accent-cyan);margin-bottom:28px;
+  opacity:0;animation:fadeUp 0.9s ease 0.2s forwards;
+  display:flex;align-items:center;gap:10px;justify-content:center;
+}
+.hero-kicker::before,.hero-kicker::after{
+  content:'';display:block;width:40px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent-cyan));
+}
+.hero-kicker::after{transform:scaleX(-1)}
+.hero-h1{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(2.8rem,8vw,7rem);
+  font-weight:800;line-height:0.95;letter-spacing:-0.04em;
+  margin-bottom:28px;
+  opacity:0;animation:fadeUp 0.9s ease 0.4s forwards;
+}
+.hero-h1 .w1{display:block;color:#fff}
+.hero-h1 .w2{
+  display:block;
+  background:linear-gradient(135deg,var(--accent-blue) 0%,var(--accent-violet) 40%,var(--accent-pink) 80%,var(--accent-cyan) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-size:300% 300%;animation:gradShift 5s ease infinite, fadeUp 0.9s ease 0.4s forwards;
+}
+.hero-sub{
+  font-size:clamp(1rem,2.5vw,1.25rem);color:var(--text-secondary);
+  max-width:700px;line-height:1.9;
+  opacity:0;animation:fadeUp 0.9s ease 0.6s forwards;margin-bottom:48px;
+}
+.hero-sub em{color:var(--text-primary);font-style:normal;font-weight:500}
+.hero-badges{
+  display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+  opacity:0;animation:fadeUp 0.9s ease 0.8s forwards;
+  margin-bottom:72px;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;border-radius:100px;
+  font-size:0.78rem;font-weight:500;
+  backdrop-filter:blur(20px);
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.badge:hover{transform:translateY(-2px)}
+.badge-v{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);color:var(--accent-violet);box-shadow:0 4px 20px rgba(124,58,237,0.1)}
+.badge-c{background:rgba(6,182,212,0.10);border:1px solid rgba(6,182,212,0.25);color:var(--accent-cyan);box-shadow:0 4px 20px rgba(6,182,212,0.08)}
+.badge-p{background:rgba(236,72,153,0.10);border:1px solid rgba(236,72,153,0.25);color:var(--accent-pink);box-shadow:0 4px 20px rgba(236,72,153,0.08)}
+.scroll-hint{
+  position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  color:var(--text-muted);font-family:'JetBrains Mono',monospace;
+  font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;
+  animation:float 3s ease infinite;
+}
+.scroll-hint svg{animation:float 3s ease infinite 0.5s}
+@keyframes float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
 
-  /* ── SECTIONS ── */
-  section { position: relative; z-index: 2; }
+/* ── BRAIN HERO VISUAL ── */
+.hero-brain{
+  position:relative;width:clamp(220px,38vw,320px);height:clamp(220px,38vw,320px);
+  margin:0 auto 52px;
+  opacity:0;animation:fadeUp 0.9s ease 0.1s forwards;
+}
+.hb-ring{
+  position:absolute;border-radius:50%;border:1px solid;
+  top:50%;left:50%;animation:spinRing linear infinite;
+}
+.hb-ring:nth-child(1){width:90%;height:90%;margin-top:-45%;margin-left:-45%;border-color:rgba(59,130,246,0.15);animation-duration:30s}
+.hb-ring:nth-child(2){width:75%;height:75%;margin-top:-37.5%;margin-left:-37.5%;border-color:rgba(124,58,237,0.12);animation-duration:20s;animation-direction:reverse}
+.hb-ring:nth-child(3){width:60%;height:60%;margin-top:-30%;margin-left:-30%;border-color:rgba(6,182,212,0.1);animation-duration:15s}
+@keyframes spinRing{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.hb-core{
+  position:absolute;inset:20%;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,rgba(124,58,237,0.6),rgba(59,130,246,0.4) 40%,rgba(6,182,212,0.2) 70%,transparent);
+  animation:corePulse 3s ease infinite;
+  box-shadow:0 0 80px rgba(124,58,237,0.4),0 0 160px rgba(59,130,246,0.2),inset 0 0 40px rgba(255,255,255,0.05);
+}
+@keyframes corePulse{0%,100%{transform:scale(1);opacity:0.9}50%{transform:scale(1.08);opacity:1}}
+.hb-inner{
+  position:absolute;inset:35%;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,0.95),rgba(200,180,255,0.7));
+  filter:blur(6px);
+  animation:innerPulse 2s ease infinite alternate;
+}
+@keyframes innerPulse{from{transform:scale(0.7);opacity:0.5}to{transform:scale(1.3);opacity:0.9}}
+.hb-label{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Space Grotesk',sans-serif;font-size:clamp(0.75rem,2.5vw,1rem);
+  font-weight:700;color:#fff;text-align:center;line-height:1.35;
+  text-shadow:0 0 20px rgba(124,58,237,0.9),0 0 40px rgba(59,130,246,0.5);
+  letter-spacing:-0.01em;
+}
 
-  /* ── HERO ── */
-  #hero {
-    min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 120px 24px 80px;
-    position: relative; overflow: hidden;
-  }
-  .hero-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--accent-cyan); margin-bottom: 24px;
-    opacity: 0; animation: fadeUp 0.8s ease 0.3s forwards;
-  }
-  .hero-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(2.4rem, 7vw, 6rem);
-    font-weight: 800; line-height: 1.0; letter-spacing: -0.03em;
-    margin-bottom: 24px;
-    opacity: 0; animation: fadeUp 0.8s ease 0.5s forwards;
-  }
-  .hero-title .line-1 { display: block; color: var(--text-primary); }
-  .hero-title .line-2 {
-    display: block;
-    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-violet) 50%, var(--accent-pink) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-size: 200% 200%; animation: gradShift 4s ease infinite, fadeUp 0.8s ease 0.5s forwards;
-  }
-  @keyframes gradShift {
-    0%,100%{ background-position: 0% 50%; }
-    50%{ background-position: 100% 50%; }
-  }
-  .hero-sub {
-    font-size: clamp(1rem, 2.5vw, 1.25rem); color: var(--text-secondary);
-    max-width: 680px; line-height: 1.8;
-    opacity: 0; animation: fadeUp 0.8s ease 0.7s forwards;
-    margin-bottom: 48px;
-  }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3);
-    border-radius: 100px; padding: 10px 20px;
-    font-size: 0.85rem; color: var(--accent-violet);
-    opacity: 0; animation: fadeUp 0.8s ease 0.9s forwards;
-    margin-bottom: 64px;
-  }
-  .hero-badge .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent-violet);
-    animation: pulse 2s ease infinite;
-  }
-  @keyframes pulse {
-    0%,100%{ opacity:1; transform:scale(1); }
-    50%{ opacity:0.4; transform:scale(1.4); }
-  }
-  .scroll-cta {
-    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    color: var(--text-muted); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
-    animation: bounce 2s ease infinite;
-  }
-  @keyframes bounce {
-    0%,100%{ transform: translateX(-50%) translateY(0); }
-    50%{ transform: translateX(-50%) translateY(8px); }
-  }
-  .scroll-cta::after {
-    content: ''; display: block; width: 1px; height: 40px;
-    background: linear-gradient(to bottom, var(--accent-blue), transparent);
-  }
-  .orbit-ring {
-    position: absolute; border-radius: 50%; border: 1px solid;
-    animation: spin linear infinite;
-    pointer-events: none;
-  }
-  .orbit-ring:nth-child(1){
-    width:400px;height:400px; top:50%;left:50%;
-    transform:translate(-50%,-50%);
-    border-color: rgba(59,130,246,0.08);
-    animation-duration: 40s;
-  }
-  .orbit-ring:nth-child(2){
-    width:650px;height:650px; top:50%;left:50%;
-    transform:translate(-50%,-50%);
-    border-color: rgba(124,58,237,0.05);
-    animation-duration: 70s;
-    animation-direction: reverse;
-  }
-  .orbit-ring:nth-child(3){
-    width:900px;height:900px; top:50%;left:50%;
-    transform:translate(-50%,-50%);
-    border-color: rgba(6,182,212,0.04);
-    animation-duration: 100s;
-  }
-  @keyframes spin { from{transform:translate(-50%,-50%) rotate(0deg);} to{transform:translate(-50%,-50%) rotate(360deg);} }
+/* ── SECTION WRAPPER ── */
+.sec{position:relative;z-index:2;}
+.container{max-width:1140px;margin:0 auto;padding:0 28px}
 
-  /* ── BRAIN GRAPHIC ── */
-  .brain-visual {
-    position: relative; width: clamp(200px, 40vw, 340px); height: clamp(200px, 40vw, 340px);
-    margin: 0 auto 48px;
-    opacity: 0; animation: fadeUp 0.8s ease 0.2s forwards;
-  }
-  .brain-circle {
-    position: absolute; border-radius: 50%;
-    animation: brainPulse 3s ease infinite;
-  }
-  .brain-circle:nth-child(1){
-    inset: 0; background: radial-gradient(circle at 40% 40%, rgba(124,58,237,0.3), rgba(59,130,246,0.1) 60%, transparent);
-    animation-delay: 0s;
-  }
-  .brain-circle:nth-child(2){
-    inset: 12%; background: radial-gradient(circle at 60% 60%, rgba(6,182,212,0.2), transparent 70%);
-    animation-delay: 0.5s;
-  }
-  .brain-circle:nth-child(3){
-    inset: 25%;
-    background: radial-gradient(circle at 50% 50%, rgba(236,72,153,0.15), transparent 70%);
-    animation-delay: 1s;
-  }
-  .brain-core {
-    position: absolute; inset: 35%;
-    background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(59,130,246,0.6));
-    border-radius: 50%; filter: blur(8px);
-    animation: brainCore 2s ease infinite alternate;
-  }
-  @keyframes brainPulse {
-    0%,100%{ transform: scale(1); opacity:0.8; }
-    50%{ transform: scale(1.05); opacity:1; }
-  }
-  @keyframes brainCore {
-    from{ transform:scale(0.8); opacity:0.6; }
-    to{ transform:scale(1.2); opacity:1; }
-  }
-  .brain-label {
-    position: absolute; inset:0;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(0.9rem, 3vw, 1.15rem); font-weight: 700;
-    color: white; text-shadow: 0 0 20px rgba(124,58,237,0.8);
-    letter-spacing: -0.01em; text-align: center;
-    line-height: 1.3;
-  }
-  .synapses {
-    position: absolute; inset: -20px;
-    animation: spin 20s linear infinite;
-  }
-  .synapse-dot {
-    position: absolute; width: 6px; height: 6px;
-    border-radius: 50%; background: var(--accent-cyan);
-    box-shadow: 0 0 10px var(--accent-cyan);
-    animation: synapsePulse 1.5s ease infinite;
-  }
-  @keyframes synapsePulse {
-    0%,100%{ opacity:0.3; transform:scale(0.8); }
-    50%{ opacity:1; transform:scale(1.3); }
-  }
+/* ── SECTION HEADERS ── */
+.sh{text-align:center;padding:90px 28px 52px}
+.sh .tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;
+  padding:7px 16px;border-radius:100px;margin-bottom:20px;
+}
+.tag-b{color:var(--accent-blue);background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2)}
+.tag-v{color:var(--accent-violet);background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2)}
+.tag-c{color:var(--accent-cyan);background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2)}
+.tag-p{color:var(--accent-pink);background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2)}
+.tag-a{color:var(--accent-amber);background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2)}
+.tag-e{color:var(--accent-emerald);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2)}
+.sh h2{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(2rem,5.5vw,3.5rem);
+  font-weight:800;line-height:1.1;letter-spacing:-0.03em;
+  margin-bottom:18px;
+}
+.sh p{
+  font-size:clamp(0.95rem,2vw,1.15rem);
+  color:var(--text-secondary);max-width:700px;
+  margin:0 auto;line-height:1.85;
+}
 
-  /* ── CONTENT WRAPPER ── */
-  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+/* ── CARDS ── */
+.grid{
+  display:grid;gap:18px;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));
+  max-width:1140px;margin:0 auto;padding:0 28px 90px;
+}
+.card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:22px;padding:34px;position:relative;overflow:hidden;
+  transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease;
+  backdrop-filter:blur(24px);
+  transform-style:preserve-3d;
+}
+.card::before{
+  content:'';position:absolute;inset:0;border-radius:22px;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(124,58,237,0.08),transparent 60%);
+  opacity:0;transition:opacity 0.3s;pointer-events:none;
+}
+.card:hover::before{opacity:1}
+.card:hover{border-color:var(--border-bright);box-shadow:0 24px 80px rgba(0,0,0,0.5),0 0 60px rgba(59,130,246,0.12)}
+.card-stripe{position:absolute;top:0;left:0;bottom:0;width:3px;border-radius:22px 0 0 22px}
+.card-ico{font-size:2.2rem;margin-bottom:18px;display:block;filter:drop-shadow(0 0 14px currentColor)}
+.card-h{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:10px}
+.card-p{font-size:0.88rem;color:var(--text-secondary);line-height:1.75}
 
-  /* ── SECTION HEADER ── */
-  .section-header {
-    text-align: center; padding: 80px 24px 48px;
-  }
-  .section-tag {
-    display: inline-block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
-    padding: 6px 14px; border-radius: 100px;
-    margin-bottom: 16px;
-  }
-  .tag-blue { color: var(--accent-blue); background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); }
-  .tag-violet { color: var(--accent-violet); background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2); }
-  .tag-cyan { color: var(--accent-cyan); background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); }
-  .tag-pink { color: var(--accent-pink); background: rgba(236,72,153,0.1); border: 1px solid rgba(236,72,153,0.2); }
-  .tag-amber { color: var(--accent-amber); background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); }
-  .tag-emerald { color: var(--accent-emerald); background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); }
+/* ── DIVIDER ── */
+.div{
+  max-width:1140px;margin:0 auto;padding:0 28px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(59,130,246,0.15),rgba(124,58,237,0.15),transparent);
+}
 
-  .section-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(1.8rem, 5vw, 3rem);
-    font-weight: 700; line-height: 1.15; letter-spacing: -0.02em;
-    margin-bottom: 16px;
-  }
-  .section-desc {
-    font-size: clamp(0.95rem, 2vw, 1.1rem);
-    color: var(--text-secondary); max-width: 680px;
-    margin: 0 auto; line-height: 1.8;
-  }
+/* ── QUOTE ── */
+.quote{max-width:820px;margin:0 auto;padding:0 28px 90px}
+.quote-in{
+  position:relative;padding:52px 44px;
+  border-radius:28px;text-align:center;overflow:hidden;
+}
+.quote-in::before{
+  content:'"';position:absolute;top:-30px;left:12px;
+  font-size:14rem;color:rgba(124,58,237,0.07);
+  font-family:Georgia,serif;line-height:1;pointer-events:none;
+}
+.quote-in::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(124,58,237,0.12),transparent 70%);
+  pointer-events:none;
+}
+.quote-in blockquote{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(1.05rem,2.8vw,1.5rem);font-weight:600;
+  line-height:1.65;color:var(--text-primary);
+  position:relative;z-index:1;font-style:italic;
+}
+.quote-in cite{
+  display:block;margin-top:22px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;color:var(--text-muted);
+  letter-spacing:0.08em;not-italic;font-style:normal;
+  position:relative;z-index:1;
+}
 
-  /* ── CARDS ── */
-  .cards-grid {
-    display: grid; gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-    padding: 0 24px 80px;
-    max-width: 1100px; margin: 0 auto;
-  }
-  .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 20px; padding: 32px;
-    position: relative; overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-    cursor: default;
-    backdrop-filter: blur(20px);
-  }
-  .card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(59,130,246,0.35);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4), var(--glow-blue);
-  }
-  .card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
-    opacity: 0; transition: opacity 0.3s;
-  }
-  .card:hover::before { opacity: 1; }
-  .card-icon {
-    font-size: 2rem; margin-bottom: 16px; display: block;
-    filter: drop-shadow(0 0 12px currentColor);
-  }
-  .card-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.1rem; font-weight: 700;
-    margin-bottom: 10px; color: var(--text-primary);
-  }
-  .card-desc {
-    font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;
-  }
-  .card-accent { position: absolute; top: 0; left: 0; bottom: 0; width: 4px; border-radius: 20px 0 0 20px; }
+/* ── PREFACE BOX ── */
+.preface-wrap{max-width:880px;margin:0 auto;padding:0 28px 90px}
+.preface-box{
+  position:relative;padding:48px 44px;
+  background:linear-gradient(135deg,rgba(6,182,212,0.06),rgba(59,130,246,0.04),rgba(124,58,237,0.04));
+  border:1px solid rgba(6,182,212,0.2);
+  border-radius:26px;overflow:hidden;
+}
+.preface-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent-cyan),var(--accent-blue),var(--accent-violet));
+}
+.preface-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--accent-cyan);margin-bottom:18px;
+}
+.preface-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-cyan);box-shadow:0 0 8px var(--accent-cyan);animation:livePulse 1.5s ease infinite}
+.preface-box h3{
+  font-family:'Space Grotesk',sans-serif;font-size:clamp(1.2rem,3vw,1.65rem);
+  font-weight:800;margin-bottom:18px;letter-spacing:-0.02em;
+}
+.preface-box p{font-size:0.95rem;color:var(--text-secondary);line-height:1.9;margin-bottom:14px}
+.preface-box p:last-child{margin-bottom:0}
+.preface-box strong{color:var(--text-primary)}
 
-  /* ── INTENSE WORLD SECTION ── */
-  #intense-world {
-    padding: 0 0 80px;
-  }
-  .iw-visual {
-    max-width: 900px; margin: 0 auto 60px; padding: 0 24px;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-  }
-  @media(max-width:600px){ .iw-visual { grid-template-columns: 1fr; } }
-  .iw-card {
-    padding: 28px 24px; border-radius: 16px; position: relative; overflow: hidden;
-    border: 1px solid var(--border);
-  }
-  .iw-card-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
-    margin-bottom: 12px; opacity: 0.7;
-  }
-  .iw-card-value {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 800;
-    line-height: 1; margin-bottom: 8px;
-  }
-  .iw-card-sub { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; }
+/* ── DATA PILLS ── */
+.pills{
+  display:flex;flex-wrap:wrap;gap:12px;
+  max-width:960px;margin:0 auto;padding:0 28px 60px;
+  justify-content:center;
+}
+.pill{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 20px;border-radius:100px;
+  border:1px solid var(--border);background:var(--bg-card);
+  font-size:0.83rem;backdrop-filter:blur(20px);
+  transition:transform 0.2s,border-color 0.2s,box-shadow 0.2s;
+}
+.pill:hover{transform:scale(1.05);border-color:var(--border-bright);box-shadow:0 4px 24px rgba(59,130,246,0.15)}
+.pill-val{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.1rem}
+.pill-lbl{color:var(--text-secondary)}
 
-  /* ── BURNOUT TIMELINE ── */
-  .timeline {
-    max-width: 800px; margin: 0 auto; padding: 0 24px 80px;
-    position: relative;
-  }
-  .timeline::before {
-    content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 2px;
-    background: linear-gradient(to bottom, var(--accent-violet), var(--accent-blue), var(--accent-cyan), transparent);
-  }
-  @media(min-width:600px){
-    .timeline::before { left: 50%; transform: translateX(-50%); }
-  }
-  .timeline-item {
-    display: flex; gap: 24px; margin-bottom: 40px; padding-left: 56px;
-    position: relative; opacity: 0;
-    animation: fadeUp 0.6s ease forwards;
-  }
-  @media(min-width:600px){
-    .timeline-item { padding-left: 0; }
-    .timeline-item:nth-child(odd) { flex-direction: row-reverse; padding-right: 56px; }
-    .timeline-item:nth-child(even) { padding-left: 56px; }
-  }
-  .timeline-dot {
-    position: absolute; left: 16px; top: 8px;
-    width: 18px; height: 18px; border-radius: 50%;
-    border: 3px solid var(--bg-deep);
-    flex-shrink: 0;
-    box-shadow: 0 0 15px currentColor;
-  }
-  @media(min-width:600px){
-    .timeline-dot { left: 50%; transform: translateX(-50%); }
-  }
-  .timeline-content {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px; flex: 1;
-    backdrop-filter: blur(20px);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .timeline-content:hover {
-    transform: scale(1.01);
-    box-shadow: 0 8px 40px rgba(0,0,0,0.3);
-  }
-  .timeline-step {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-  .timeline-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.05rem; font-weight: 700; margin-bottom: 10px;
-  }
-  .timeline-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7; }
+/* ── IW COMPARE ── */
+.iw-compare{
+  display:grid;grid-template-columns:1fr 1fr;gap:18px;
+  max-width:900px;margin:0 auto 60px;padding:0 28px;
+}
+@media(max-width:580px){.iw-compare{grid-template-columns:1fr}}
+.iw-box{padding:32px 28px;border-radius:20px;border:1px solid;position:relative;overflow:hidden}
+.iw-box::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.03),transparent 60%);
+}
+.iw-label{font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;opacity:0.7}
+.iw-val{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.5rem,5vw,2.4rem);font-weight:800;line-height:1.1;margin-bottom:10px}
+.iw-sub{font-size:0.86rem;color:var(--text-secondary);line-height:1.7}
 
-  /* ── COMPARISON TABLE ── */
-  .table-wrap {
-    max-width: 900px; margin: 0 auto; padding: 0 24px 80px;
-    overflow-x: auto;
-  }
-  table {
-    width: 100%; border-collapse: collapse;
-    background: var(--bg-card); border-radius: 16px; overflow: hidden;
-    border: 1px solid var(--border);
-    backdrop-filter: blur(20px);
-  }
-  thead tr {
-    background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(124,58,237,0.15));
-  }
-  th {
-    padding: 16px 20px; text-align: left;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.85rem; font-weight: 700; letter-spacing: 0.03em;
-    color: var(--text-primary); border-bottom: 1px solid var(--border);
-  }
-  td {
-    padding: 14px 20px; font-size: 0.88rem; color: var(--text-secondary);
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    vertical-align: top; line-height: 1.6;
-  }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(59,130,246,0.03); }
-  .td-strength { color: var(--accent-emerald); font-weight: 500; }
-  .td-app { color: var(--accent-cyan); }
+/* ── TABLE ── */
+.tbl-wrap{max-width:960px;margin:0 auto;padding:0 28px 90px;overflow-x:auto}
+.tbl-wrap table{
+  width:100%;border-collapse:collapse;
+  background:var(--bg-card);border-radius:20px;overflow:hidden;
+  border:1px solid var(--border);backdrop-filter:blur(24px);
+}
+thead tr{background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(124,58,237,0.10))}
+th{
+  padding:16px 22px;text-align:left;
+  font-family:'Space Grotesk',sans-serif;font-size:0.82rem;font-weight:700;
+  letter-spacing:0.04em;color:var(--text-primary);border-bottom:1px solid var(--border);
+}
+td{
+  padding:14px 22px;font-size:0.86rem;color:var(--text-secondary);
+  border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:top;line-height:1.65;
+}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(59,130,246,0.03)}
+.td-s{color:var(--accent-emerald);font-weight:500}
+.td-a{color:var(--accent-cyan)}
 
-  /* ── HELP/HURT SECTION ── */
-  .hh-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-    max-width: 900px; margin: 0 auto; padding: 0 24px 80px;
-  }
-  @media(max-width:600px){ .hh-grid { grid-template-columns: 1fr; } }
-  .hh-card {
-    border-radius: 20px; padding: 32px; border: 1px solid;
-  }
-  .hh-card.helps {
-    background: rgba(16,185,129,0.06);
-    border-color: rgba(16,185,129,0.2);
-  }
-  .hh-card.hurts {
-    background: rgba(239,68,68,0.06);
-    border-color: rgba(239,68,68,0.2);
-  }
-  .hh-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .hh-list { list-style: none; }
-  .hh-list li {
-    font-size: 0.88rem; line-height: 1.7;
-    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-    display: flex; align-items: flex-start; gap: 10px; color: var(--text-secondary);
-  }
-  .hh-list li:last-child { border-bottom: none; }
-  .hh-list li::before {
-    flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.7rem; font-weight: 700; margin-top: 2px;
-  }
-  .helps .hh-list li::before {
-    content: '✓'; background: rgba(16,185,129,0.2); color: var(--accent-emerald);
-  }
-  .hurts .hh-list li::before {
-    content: '✕'; background: rgba(239,68,68,0.2); color: #ef4444;
-  }
+/* ── TIMELINE ── */
+.timeline{max-width:820px;margin:0 auto;padding:0 28px 90px;position:relative}
+.timeline::before{
+  content:'';position:absolute;left:14px;top:0;bottom:0;width:2px;
+  background:linear-gradient(to bottom,var(--accent-violet),var(--accent-blue),var(--accent-cyan),transparent);
+  border-radius:2px;
+}
+@media(min-width:620px){.timeline::before{left:50%;transform:translateX(-50%)}}
+.tl-item{
+  display:flex;gap:24px;margin-bottom:44px;
+  padding-left:52px;position:relative;
+  opacity:0;transform:translateY(28px);
+  transition:opacity 0.6s ease,transform 0.6s ease;
+}
+.tl-item.vis{opacity:1;transform:translateY(0)}
+@media(min-width:620px){
+  .tl-item{padding-left:0}
+  .tl-item:nth-child(odd){flex-direction:row-reverse;padding-right:54px}
+  .tl-item:nth-child(even){padding-left:54px}
+}
+.tl-dot{
+  position:absolute;left:6px;top:12px;
+  width:20px;height:20px;border-radius:50%;
+  border:3px solid var(--bg-deep);flex-shrink:0;
+  box-shadow:0 0 20px currentColor;
+  z-index:1;
+}
+@media(min-width:620px){.tl-dot{left:50%;transform:translateX(-50%)}}
+.tl-box{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:18px;padding:26px;flex:1;
+  backdrop-filter:blur(24px);
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.tl-box:hover{transform:scale(1.015);box-shadow:0 10px 50px rgba(0,0,0,0.4)}
+.tl-step{font-family:'JetBrains Mono',monospace;font-size:0.63rem;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:8px}
+.tl-h{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;margin-bottom:10px}
+.tl-p{font-size:0.86rem;color:var(--text-secondary);line-height:1.75}
 
-  /* ── GENIUSES SECTION ── */
-  .geniuses-grid {
-    display: grid; gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-    max-width: 1100px; margin: 0 auto; padding: 0 24px 80px;
-  }
-  .genius-card {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px; text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
-    backdrop-filter: blur(20px);
-  }
-  .genius-card:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-  }
-  .genius-avatar {
-    font-size: 2.5rem; margin-bottom: 12px; display: block;
-    filter: drop-shadow(0 0 12px rgba(255,255,255,0.3));
-  }
-  .genius-name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.95rem; font-weight: 700;
-    margin-bottom: 6px; color: var(--text-primary);
-  }
-  .genius-trait {
-    font-size: 0.78rem; color: var(--text-secondary); line-height: 1.6;
-  }
-  .genius-badge {
-    display: inline-block; margin-top: 10px;
-    font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 4px 10px; border-radius: 100px;
-    background: rgba(124,58,237,0.15); color: var(--accent-violet);
-    border: 1px solid rgba(124,58,237,0.25);
-  }
+/* ── HH GRID ── */
+.hh-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  max-width:940px;margin:0 auto;padding:0 28px 90px;
+}
+@media(max-width:620px){.hh-grid{grid-template-columns:1fr}}
+.hh-card{border-radius:22px;padding:34px;border:1px solid;overflow:hidden;position:relative}
+.hh-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.hh-helps{background:rgba(16,185,129,0.05);border-color:rgba(16,185,129,0.2)}
+.hh-helps::before{background:linear-gradient(90deg,var(--accent-emerald),transparent)}
+.hh-hurts{background:rgba(244,63,94,0.05);border-color:rgba(244,63,94,0.2)}
+.hh-hurts::before{background:linear-gradient(90deg,var(--accent-rose),transparent)}
+.hh-title{
+  font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;
+  margin-bottom:22px;display:flex;align-items:center;gap:10px;
+}
+.hh-list{list-style:none}
+.hh-list li{
+  font-size:0.86rem;line-height:1.7;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);
+  display:flex;align-items:flex-start;gap:10px;color:var(--text-secondary);
+}
+.hh-list li:last-child{border-bottom:none}
+.hh-icon{
+  flex-shrink:0;width:20px;height:20px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.65rem;font-weight:700;margin-top:3px;
+}
+.helps-icon{background:rgba(16,185,129,0.15);color:var(--accent-emerald)}
+.hurts-icon{background:rgba(244,63,94,0.15);color:var(--accent-rose)}
 
-  /* ── QUOTE BLOCK ── */
-  .quote-block {
-    max-width: 800px; margin: 0 auto 80px; padding: 0 24px;
-  }
-  .quote-inner {
-    position: relative; padding: 48px 40px;
-    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(59,130,246,0.08));
-    border: 1px solid rgba(124,58,237,0.2);
-    border-radius: 24px; text-align: center;
-    overflow: hidden;
-  }
-  .quote-inner::before {
-    content: '"'; position: absolute; top: -20px; left: 20px;
-    font-size: 12rem; color: rgba(124,58,237,0.08);
-    font-family: Georgia, serif; line-height: 1; pointer-events: none;
-  }
-  .quote-text {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(1.1rem, 3vw, 1.5rem); font-weight: 600;
-    line-height: 1.6; color: var(--text-primary);
-    position: relative; z-index: 1;
-    font-style: italic;
-  }
-  .quote-attr {
-    margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);
-    font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em;
-  }
+/* ── GENIUSES ── */
+.genius-grid{
+  display:grid;gap:16px;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));
+  max-width:1140px;margin:0 auto;padding:0 28px 90px;
+}
+.genius-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:18px;padding:26px;text-align:center;
+  transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
+  backdrop-filter:blur(24px);
+}
+.genius-card:hover{transform:translateY(-8px) scale(1.02);border-color:var(--border-bright);box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 40px rgba(124,58,237,0.1)}
+.genius-emo{font-size:2.6rem;margin-bottom:14px;display:block;filter:drop-shadow(0 0 14px rgba(255,255,255,0.25))}
+.genius-name{font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;margin-bottom:8px}
+.genius-text{font-size:0.78rem;color:var(--text-secondary);line-height:1.65}
+.genius-tag{
+  display:inline-block;margin-top:12px;
+  font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;
+  padding:4px 11px;border-radius:100px;
+  background:rgba(124,58,237,0.12);color:var(--accent-violet);
+  border:1px solid rgba(124,58,237,0.2);
+}
 
-  /* ── CLOSING ── */
-  #closing {
-    padding: 80px 24px;
-    text-align: center; position: relative; overflow: hidden;
-  }
-  .closing-glow {
-    position: absolute; inset: 0; pointer-events: none;
-    background: radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.12) 0%, transparent 70%);
-  }
-  .closing-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(2rem, 6vw, 4rem);
-    font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
-    margin-bottom: 24px;
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet), var(--accent-pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .closing-desc {
-    font-size: clamp(1rem, 2.5vw, 1.2rem);
-    color: var(--text-secondary); max-width: 640px; margin: 0 auto 48px;
-    line-height: 1.8;
-  }
-  .closing-cta {
-    display: inline-flex; gap: 16px; flex-wrap: wrap; justify-content: center;
-  }
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 14px 28px; border-radius: 12px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.9rem; font-weight: 600;
-    text-decoration: none; cursor: pointer; border: none;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
-    color: white;
-    box-shadow: 0 4px 30px rgba(124,58,237,0.4);
-  }
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 40px rgba(124,58,237,0.6);
-  }
-  .btn-ghost {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.15);
-    color: var(--text-secondary);
-  }
-  .btn-ghost:hover {
-    border-color: var(--accent-cyan);
-    color: var(--accent-cyan);
-    transform: translateY(-2px);
-  }
+/* ── BODY CARDS ── */
+.body-grid{
+  display:grid;gap:16px;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,185px),1fr));
+  max-width:1060px;margin:0 auto;padding:0 28px 90px;
+}
+.bc{
+  background:var(--bg-card);border:1px solid;
+  border-radius:18px;padding:26px;
+  backdrop-filter:blur(24px);transition:transform 0.2s;
+}
+.bc:hover{transform:translateY(-4px)}
+.bc-ico{font-size:1.9rem;margin-bottom:12px;display:block}
+.bc-name{font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:700;margin-bottom:8px}
+.bc-txt{font-size:0.78rem;color:var(--text-secondary);line-height:1.65}
 
-  /* ── FOOTER ── */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 32px 24px; text-align: center;
-    color: var(--text-muted); font-size: 0.8rem;
-    font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em;
-    position: relative; z-index: 2;
-  }
+/* ── CLOSING ── */
+#closing{
+  padding:100px 28px 120px;
+  text-align:center;position:relative;z-index:2;overflow:hidden;
+}
+.closing-nebula{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 30% 50%,rgba(124,58,237,0.12) 0%,transparent 55%),
+    radial-gradient(ellipse at 70% 50%,rgba(59,130,246,0.10) 0%,transparent 55%),
+    radial-gradient(ellipse at 50% 80%,rgba(236,72,153,0.08) 0%,transparent 55%);
+}
+.closing-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--accent-pink);margin-bottom:28px;display:block;
+}
+.closing-h{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(2.4rem,7vw,5.5rem);
+  font-weight:800;line-height:1.0;letter-spacing:-0.04em;
+  margin-bottom:32px;
+  background:linear-gradient(135deg,#fff 0%,var(--accent-blue) 35%,var(--accent-violet) 65%,var(--accent-pink) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-size:200%;animation:gradShift 5s ease infinite;
+}
+.closing-manifesto{
+  max-width:740px;margin:0 auto 52px;
+  background:rgba(124,58,237,0.07);
+  border:1px solid rgba(124,58,237,0.2);border-radius:24px;
+  padding:40px 36px;text-align:left;position:relative;z-index:1;
+}
+.closing-manifesto p{
+  font-size:clamp(0.92rem,2vw,1.08rem);
+  color:var(--text-secondary);line-height:1.9;margin-bottom:18px;
+}
+.closing-manifesto p:last-child{margin-bottom:0}
+.closing-manifesto strong{color:var(--text-primary)}
+.closing-manifesto .big-line{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(1.1rem,2.5vw,1.4rem);font-weight:700;
+  color:var(--text-primary);line-height:1.45;margin-bottom:22px;
+  padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.btn-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:15px 30px;border-radius:14px;
+  font-family:'Space Grotesk',sans-serif;font-size:0.92rem;font-weight:700;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.btn-pri{
+  background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet));
+  color:#fff;box-shadow:0 6px 30px rgba(124,58,237,0.45);
+}
+.btn-pri:hover{transform:translateY(-3px);box-shadow:0 12px 50px rgba(124,58,237,0.65)}
+.btn-sec{
+  background:transparent;border:1px solid rgba(255,255,255,0.13);
+  color:var(--text-secondary);
+}
+.btn-sec:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);transform:translateY(-3px)}
 
-  /* ── DIVIDER ── */
-  .divider {
-    max-width: 1100px; margin: 0 auto; padding: 0 24px;
-    height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent);
-    margin-bottom: 0;
-  }
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);padding:36px 28px;
+  text-align:center;color:var(--text-muted);
+  font-family:'JetBrains Mono',monospace;font-size:0.72rem;
+  letter-spacing:0.06em;position:relative;z-index:2;
+  line-height:1.9;
+}
 
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .fade-in {
-    opacity: 0;
-    transition: opacity 0.7s ease, transform 0.7s ease;
-    transform: translateY(20px);
-  }
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.fi{opacity:0;transform:translateY(22px);transition:opacity 0.75s ease,transform 0.75s ease}
+.fi.vis{opacity:1;transform:translateY(0)}
 
-  /* ── PREFACE ── */
-  .preface-box {
-    max-width: 860px; margin: 0 auto; padding: 0 24px 80px;
-  }
-  .preface-inner {
-    background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(59,130,246,0.04));
-    border: 1px solid rgba(6,182,212,0.2);
-    border-radius: 20px; padding: 40px 36px;
-    position: relative; overflow: hidden;
-  }
-  .preface-inner::before {
-    content: 'CRITICAL';
-    position: absolute; top: 16px; right: 20px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.6rem; letter-spacing: 0.2em;
-    color: var(--accent-cyan); opacity: 0.5;
-  }
-  .preface-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1rem; font-weight: 700; color: var(--accent-cyan);
-    margin-bottom: 16px; letter-spacing: 0.03em;
-    text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.12em;
-  }
-  .preface-text {
-    font-size: 0.95rem; color: var(--text-secondary); line-height: 1.85;
-  }
-  .preface-text strong { color: var(--text-primary); }
-
-  /* ── DATA PILLS ── */
-  .data-pills {
-    display: flex; flex-wrap: wrap; gap: 12px;
-    max-width: 900px; margin: 0 auto; padding: 0 24px 60px;
-    justify-content: center;
-  }
-  .pill {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 18px; border-radius: 100px;
-    border: 1px solid var(--border);
-    background: var(--bg-card);
-    font-size: 0.83rem; backdrop-filter: blur(20px);
-    transition: transform 0.2s, border-color 0.2s;
-  }
-  .pill:hover { transform: scale(1.04); border-color: rgba(59,130,246,0.4); }
-  .pill-value {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700; font-size: 1rem;
-  }
-  .pill-label { color: var(--text-secondary); }
-
-  /* ── PHYSICAL BODY MAP ── */
-  .body-grid {
-    display: grid; gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
-    max-width: 1000px; margin: 0 auto; padding: 0 24px 80px;
-  }
-  .body-card {
-    background: var(--bg-card); border: 1px solid;
-    border-radius: 16px; padding: 24px;
-    backdrop-filter: blur(20px);
-    transition: transform 0.2s;
-  }
-  .body-card:hover { transform: translateY(-3px); }
-  .body-card-icon { font-size: 1.8rem; margin-bottom: 10px; display: block; }
-  .body-card-name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.9rem; font-weight: 700; margin-bottom: 6px;
-  }
-  .body-card-link { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; }
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg-deep); }
-  ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.6); }
-
-  /* mobile nav toggle */
-  .nav-hamburger {
-    display: none; cursor: pointer;
-    flex-direction: column; gap: 5px;
-    padding: 4px;
-  }
-  .nav-hamburger span {
-    display: block; width: 22px; height: 2px;
-    background: var(--text-secondary); border-radius: 2px;
-    transition: all 0.3s;
-  }
-  @media(max-width:768px){
-    .nav-hamburger { display: flex; }
-  }
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg-deep)}
+::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.35);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(124,58,237,0.6)}
 </style>
 </head>
 <body>
 
-<!-- STARFIELD -->
-<div id="starfield"><canvas id="stars"></canvas></div>
+<div id="progress"></div>
+<canvas id="canvas-bg"></canvas>
 
 <!-- NAV -->
 <nav>
   <div class="nav-logo">Autistic Savant OS</div>
+  <div class="nav-pill"><span class="live-dot"></span>Live Document</div>
   <ul class="nav-links">
     <li><a href="#preface">Preface</a></li>
     <li><a href="#os">The OS</a></li>
     <li><a href="#savant">Savant</a></li>
     <li><a href="#burnout">Burnout</a></li>
     <li><a href="#body">Body</a></li>
-    <li><a href="#geniuses">Geniuses</a></li>
-    <li><a href="#loved-ones">For Loved Ones</a></li>
+    <li><a href="#geniuses">Legacy</a></li>
+    <li><a href="#loved-ones">Loved Ones</a></li>
     <li><a href="#closing">The Ask</a></li>
   </ul>
 </nav>
 
 <!-- HERO -->
 <section id="hero">
-  <div class="orbit-ring"></div>
-  <div class="orbit-ring"></div>
-  <div class="orbit-ring"></div>
-
-  <div class="brain-visual">
-    <div class="brain-circle"></div>
-    <div class="brain-circle"></div>
-    <div class="brain-circle"></div>
-    <div class="brain-core"></div>
-    <div class="brain-label">Hyper-<br>Processing<br>Engine</div>
-    <!-- synapse dots -->
-    <svg class="synapses" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="180" cy="40" r="4" fill="#06b6d4" opacity="0.8">
-        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="320" cy="130" r="3" fill="#7c3aed" opacity="0.8">
-        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" begin="0.5s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="310" cy="270" r="5" fill="#3b82f6" opacity="0.8">
-        <animate attributeName="opacity" values="0.3;1;0.3" dur="2.5s" begin="1s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="160" cy="330" r="3" fill="#ec4899" opacity="0.8">
-        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="50" cy="250" r="4" fill="#10b981" opacity="0.8">
-        <animate attributeName="opacity" values="0.3;1;0.3" dur="2.2s" begin="0.7s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="40" cy="110" r="3" fill="#f59e0b" opacity="0.8">
-        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.6s" begin="1.2s" repeatCount="indefinite"/>
-      </circle>
-      <line x1="180" y1="44" x2="180" y2="90" stroke="#06b6d4" stroke-width="1" opacity="0.2"/>
-      <line x1="316" y1="133" x2="280" y2="160" stroke="#7c3aed" stroke-width="1" opacity="0.2"/>
-      <line x1="306" y1="267" x2="270" y2="240" stroke="#3b82f6" stroke-width="1" opacity="0.2"/>
-      <line x1="163" y1="326" x2="180" y2="290" stroke="#ec4899" stroke-width="1" opacity="0.2"/>
-      <line x1="54" y1="247" x2="90" y2="230" stroke="#10b981" stroke-width="1" opacity="0.2"/>
-      <line x1="43" y1="113" x2="80" y2="150" stroke="#f59e0b" stroke-width="1" opacity="0.2"/>
-    </svg>
+  <div class="hero-brain">
+    <div class="hb-ring"></div>
+    <div class="hb-ring"></div>
+    <div class="hb-ring"></div>
+    <div class="hb-core"></div>
+    <div class="hb-inner"></div>
+    <div class="hb-label">Hyper-<br/>Processing<br/>Engine</div>
   </div>
 
-  <p class="hero-eyebrow">// A letter. A diagnosis. A declaration.</p>
-  <h1 class="hero-title">
-    <span class="line-1">The Autistic Savant OS</span>
-    <span class="line-2">What You Don't Know But Should</span>
+  <p class="hero-kicker">A Letter · A Science · A Declaration</p>
+  <h1 class="hero-h1">
+    <span class="w1">The Autistic Savant OS</span>
+    <span class="w2">What You Don't Know But Should</span>
   </h1>
   <p class="hero-sub">
-    This is the in-person conversation that cannot happen right now — written in the language that actually works. Built for Mum, for family, for anyone who cares enough to understand.
+    This is the in-person conversation that cannot happen right now —<br/>
+    written in the <em>only language that actually works</em>.<br/>
+    Built for loved ones. Built for the world. Built to be understood.
   </p>
-  <div class="hero-badge">
-    <span class="dot"></span>
-    Written in the only language available right now — and that's okay
+  <div class="hero-badges">
+    <span class="badge badge-v">⚡ Neuroscience-Backed</span>
+    <span class="badge badge-c">🧠 Clinically Documented</span>
+    <span class="badge badge-p">🌌 Genuinely Unprecedented</span>
   </div>
-
-  <div class="scroll-cta">scroll</div>
+  <div class="scroll-hint">
+    scroll to begin
+    <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+      <rect x="6.5" y="0.5" width="3" height="8" rx="1.5" fill="rgba(148,163,184,0.4)"/>
+      <path d="M8 16 L4 20 L8 24 L12 20 Z" fill="rgba(148,163,184,0.3)"/>
+    </svg>
+  </div>
 </section>
 
 <!-- PREFACE -->
-<section id="preface">
-  <div class="section-header fade-in">
-    <span class="section-tag tag-cyan">Before You Read Anything Else</span>
-    <h2 class="section-title">Why This Exists</h2>
-    <p class="section-desc">This is not avoidance. This is not hiding. This is the most fluent form of communication available — and reading it carefully, without immediately asking to "talk about it," is the single most supportive thing you can do.</p>
+<section id="preface" class="sec">
+  <div class="sh fi">
+    <span class="tag tag-c">⚡ Before Anything Else</span>
+    <h2>Why This Document Exists</h2>
+    <p>This is not avoidance. Not hiding. Not an unwillingness to connect. This is the most fluent, honest, and complete form of communication available right now — and receiving it as such changes everything.</p>
   </div>
-  <div class="preface-box fade-in">
-    <div class="preface-inner">
-      <div class="preface-title">⚡ Read this first</div>
-      <p class="preface-text">
-        There is a version of this that happens in person — with eye contact, a calm voice, tea on the table. That version <strong>is not possible right now</strong>. Not because of avoidance, not because of a broken relationship, not because of anything personal. It is impossible because the brain doing the explaining is operating under conditions that make real-time verbal communication the single <strong>most cognitively expensive thing a human being can do</strong>.
-        <br/><br/>
-        Written words, structured logic, organized thought — <strong>this is the voice</strong>. Not a lesser voice. Not an avoidant one. The actual fluent one. Reading this is hearing it. <strong>Asking to "talk about it" afterward is the equivalent of handing back a letter and saying "can you say this out loud instead?"</strong> — and that's not something that can happen right now.
-        <br/><br/>
-        This is not an apology. It is an explanation. And explanations only work if the other person is willing to receive them in the form they come.
-      </p>
+  <div class="preface-wrap fi">
+    <div class="preface-box">
+      <div class="preface-badge"><span class="dot"></span>Read this before anything else</div>
+      <h3>This Written Word Is the Voice</h3>
+      <p>There is a version of this that happens in person — eye contact, a calm voice, tea on the table. That version <strong>is not possible right now</strong>. Not because of avoidance, not because the relationship is broken, not because of anything personal. It is impossible because the brain doing the explaining is operating under conditions that make real-time verbal communication the single <strong>most cognitively expensive thing a human being can attempt</strong>.</p>
+      <p>Written words, structured logic, compressed meaning — <strong>this is the voice</strong>. Not a lesser voice. The actual fluent one. Reading this document carefully is the equivalent of a long, honest, face-to-face conversation. It counts. It is real. It deserves to be received as such.</p>
+      <p><strong>The most supportive thing anyone can do after reading this is not ask to "talk about it."</strong> That single request can undo days of recovery. Instead: acknowledge it was read, and trust it.</p>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
+<div class="div" style="margin-bottom:0"></div>
 
-<!-- THE OS — PART 1 -->
-<section id="os">
-  <div class="section-header fade-in">
-    <span class="section-tag tag-blue">Part 01 — The Architecture</span>
-    <h2 class="section-title">The Operating System Nobody Taught You About</h2>
-    <p class="section-desc">Most people understand autism through a deficit lens. Neuroscience has moved on. The accurate model is something completely different — and far more extraordinary.</p>
+<!-- THE OS -->
+<section id="os" class="sec">
+  <div class="sh fi">
+    <span class="tag tag-b">01 — The Architecture</span>
+    <h2>The Operating System Nobody Taught You About</h2>
+    <p>Most people understand autism through a deficit lens built in the 1940s. Neuroscience has moved on — and the accurate model is something completely, profoundly different.</p>
   </div>
 
-  <!-- DATA PILLS -->
-  <div class="data-pills fade-in">
-    <div class="pill">
-      <span class="pill-value" style="color:var(--accent-violet)">~10%</span>
-      <span class="pill-label">of autistic people have savant-level skills</span>
-    </div>
-    <div class="pill">
-      <span class="pill-value" style="color:var(--accent-blue)">&lt;1%</span>
-      <span class="pill-label">of non-autistic people develop savant abilities</span>
-    </div>
-    <div class="pill">
-      <span class="pill-value" style="color:var(--accent-cyan)">Hyper-</span>
-      <span class="pill-label">reactive, plastic, perceptive, emotional</span>
-    </div>
-    <div class="pill">
-      <span class="pill-value" style="color:var(--accent-emerald)">Right</span>
-      <span class="pill-label">hemisphere dominance with expanded local connectivity</span>
-    </div>
+  <div class="pills fi">
+    <div class="pill"><span class="pill-val" style="color:var(--accent-violet)">~10%</span><span class="pill-lbl">of autistic people have savant-level skills</span></div>
+    <div class="pill"><span class="pill-val" style="color:var(--accent-blue)">&lt;1%</span><span class="pill-lbl">of non-autistic people ever develop savant abilities</span></div>
+    <div class="pill"><span class="pill-val" style="color:var(--accent-cyan)">4×</span><span class="pill-lbl">faster neural adaptation in key autistic circuits</span></div>
+    <div class="pill"><span class="pill-val" style="color:var(--accent-emerald)">Right</span><span class="pill-lbl">hemisphere — expanded local connectivity &amp; pattern depth</span></div>
   </div>
 
-  <div class="cards-grid fade-in">
-    <div class="card">
-      <div class="card-accent" style="background:var(--accent-blue)"></div>
-      <span class="card-icon" style="color:var(--accent-blue)">🔍</span>
-      <div class="card-title">Hyper-Perception</div>
-      <div class="card-desc">Sensory input arrives at higher intensity and with more detail than most people ever experience. Every stimulus is processed fully, deeply, and simultaneously. This is not oversensitivity — it is the world arriving at full resolution.</div>
-    </div>
-    <div class="card">
-      <div class="card-accent" style="background:var(--accent-violet)"></div>
-      <span class="card-icon" style="color:var(--accent-violet)">🎯</span>
-      <div class="card-title">Hyper-Attention</div>
-      <div class="card-desc">The ability to focus with extraordinary depth and duration on a single problem — what researchers call "flow states" and "hyperfocus" — is not discipline. It is neurological architecture. The brain locks in and does not let go.</div>
-    </div>
-    <div class="card">
-      <div class="card-accent" style="background:var(--accent-cyan)"></div>
-      <span class="card-icon" style="color:var(--accent-cyan)">💾</span>
-      <div class="card-title">Hyper-Memory</div>
-      <div class="card-desc">Information doesn't just stick — it integrates into complex, interconnected maps. Savant memory is qualitatively different from typical memory: more vivid, more permanent, and accessible in non-linear ways that enable pattern-finding at scale.</div>
-    </div>
-    <div class="card">
-      <div class="card-accent" style="background:var(--accent-pink)"></div>
-      <span class="card-icon" style="color:var(--accent-pink)">❤️</span>
-      <div class="card-title">Hyper-Emotionality</div>
-      <div class="card-desc">One of the most misunderstood features: emotional experiences are amplified, not absent. The apparent withdrawal is not coldness — it is protection from too much feeling, arriving too fast, with nowhere to immediately put it.</div>
-    </div>
-    <div class="card">
-      <div class="card-accent" style="background:var(--accent-amber)"></div>
-      <span class="card-icon" style="color:var(--accent-amber)">🧩</span>
-      <div class="card-title">Pattern Architecture</div>
-      <div class="card-desc">The autistic brain is a masterful pattern-detection machine. It finds connections, sequences, and structures that others miss entirely — making it uniquely suited for AI, systems design, and building things that have never been built before.</div>
-    </div>
-    <div class="card">
-      <div class="card-accent" style="background:var(--accent-emerald)"></div>
-      <span class="card-icon" style="color:var(--accent-emerald)">⚡</span>
-      <div class="card-title">Hyper-Plasticity</div>
-      <div class="card-desc">Neural circuits adapt faster and retain changes more permanently. This is the engine behind rapid skill acquisition in savant domains — the brain doesn't just learn, it restructures itself around what it is building.</div>
-    </div>
+  <div class="grid fi">
+    <div class="card"><div class="card-stripe" style="background:var(--accent-blue)"></div><span class="card-ico" style="color:var(--accent-blue)">🔬</span><div class="card-h">Hyper-Perception</div><div class="card-p">Every stimulus arrives at full resolution — no automatic filtering. The world delivers detail that others never receive. This isn't oversensitivity. It is the world as it actually is, uncompressed.</div></div>
+    <div class="card"><div class="card-stripe" style="background:var(--accent-violet)"></div><span class="card-ico" style="color:var(--accent-violet)">🎯</span><div class="card-h">Hyper-Attention</div><div class="card-p">The ability to lock into a single problem with extraordinary depth — not just discipline, but neurological architecture. The brain doesn't let go until the solution is found or the system collapses from exhaustion.</div></div>
+    <div class="card"><div class="card-stripe" style="background:var(--accent-cyan)"></div><span class="card-ico" style="color:var(--accent-cyan)">💾</span><div class="card-h">Hyper-Memory</div><div class="card-p">Information integrates into complex, interconnected maps — more vivid, more permanent, accessible non-linearly. This enables pattern-finding at a scale and depth that standard memory architecture cannot reach.</div></div>
+    <div class="card"><div class="card-stripe" style="background:var(--accent-pink)"></div><span class="card-ico" style="color:var(--accent-pink)">❤️‍🔥</span><div class="card-h">Hyper-Emotionality</div><div class="card-p">One of the most misunderstood features: the autistic emotional system is often amplified, not absent. Apparent withdrawal is protection from too much feeling arriving too fast — not the absence of feeling.</div></div>
+    <div class="card"><div class="card-stripe" style="background:var(--accent-amber)"></div><span class="card-ico" style="color:var(--accent-amber)">🧩</span><div class="card-h">Pattern Architecture</div><div class="card-p">The brain finds connections, sequences, and structures invisible to others. This is what makes it uniquely built for AI systems, architecture design, and creating things that have genuinely never existed before.</div></div>
+    <div class="card"><div class="card-stripe" style="background:var(--accent-emerald)"></div><span class="card-ico" style="color:var(--accent-emerald)">⚡</span><div class="card-h">Hyper-Plasticity</div><div class="card-p">Neural circuits adapt faster and retain changes more permanently. This is the engine of rapid skill acquisition — the brain doesn't just learn a domain, it restructures itself entirely around what it's building.</div></div>
   </div>
 
-  <div class="quote-block fade-in">
-    <div class="quote-inner">
-      <p class="quote-text">"The autistic brain is not a broken neurotypical brain. It is a completely different cognitive architecture — engineered not for general-purpose efficiency, but for extraordinary depth, precision, and the ability to find order in complexity no one else can navigate."</p>
-      <p class="quote-attr">— Intense World Theory, Markram &amp; Markram (2010) — NIH/PMC</p>
+  <div class="quote fi">
+    <div class="quote-in" style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(124,58,237,0.06));border:1px solid rgba(124,58,237,0.2)">
+      <blockquote>"The autistic brain is not a broken neurotypical brain. It is a completely different cognitive architecture — a high-performance engine engineered not for general efficiency, but for extraordinary depth, precision, and the ability to find order in complexity that no other mind can navigate."</blockquote>
+      <cite>— Intense World Theory · Markram &amp; Markram, 2010 · NIH/PMC</cite>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
+<div class="div" style="margin-bottom:0"></div>
 
-<!-- SAVANT SECTION -->
-<section id="savant">
-  <div class="section-header fade-in">
-    <span class="section-tag tag-violet">Part 02 — The Gift</span>
-    <h2 class="section-title">Savant Syndrome: The Other Side of the Spectrum</h2>
-    <p class="section-desc">Savant syndrome is not a disorder. It is a condition where extraordinary, world-class skill exists alongside — and is often powered by — neurodevelopmental difference.</p>
+<!-- SAVANT -->
+<section id="savant" class="sec">
+  <div class="sh fi">
+    <span class="tag tag-v">02 — The Gift</span>
+    <h2>Savant Syndrome: The Other Side of the Spectrum</h2>
+    <p>Savant syndrome is not a disorder. It is where extraordinary, world-class skill exists alongside — and is often powered by — a neurodevelopmental difference that the world still doesn't fully understand.</p>
   </div>
 
-  <!-- INTENSE WORLD VISUAL -->
-  <div class="iw-visual fade-in">
-    <div class="iw-card" style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(124,58,237,0.08));border-color:rgba(59,130,246,0.2)">
-      <div class="iw-card-label" style="color:var(--accent-blue)">Neurotypical Brain</div>
-      <div class="iw-card-value" style="color:var(--accent-blue)">General<br/>Purpose</div>
-      <div class="iw-card-sub">Efficient multitasker. Filters heavily. Processes at standard resolution. Built for social navigation and routine task completion.</div>
+  <div class="iw-compare fi">
+    <div class="iw-box" style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(59,130,246,0.03));border-color:rgba(59,130,246,0.2)">
+      <div class="iw-label" style="color:var(--accent-blue)">Neurotypical Brain</div>
+      <div class="iw-val" style="color:var(--accent-blue)">General<br/>Purpose</div>
+      <div class="iw-sub">Efficient multitasker. Heavy filtering. Standard resolution. Built for social navigation, routine task completion, and broad adaptability across varied environments.</div>
     </div>
-    <div class="iw-card" style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(236,72,153,0.08));border-color:rgba(124,58,237,0.3)">
-      <div class="iw-card-label" style="color:var(--accent-violet)">Autistic Savant Brain</div>
-      <div class="iw-card-value" style="color:var(--accent-violet)">High-<br/>Performance</div>
-      <div class="iw-card-sub">Deep-domain supercomputer. Processes at maximum resolution. Finds patterns in chaos. Builds systems that don't exist yet. Runs hot. Needs cooling.</div>
+    <div class="iw-box" style="background:linear-gradient(135deg,rgba(124,58,237,0.12),rgba(236,72,153,0.06));border-color:rgba(124,58,237,0.3)">
+      <div class="iw-label" style="color:var(--accent-violet)">Autistic Savant Brain</div>
+      <div class="iw-val" style="color:var(--accent-violet)">High-<br/>Performance</div>
+      <div class="iw-sub">Deep-domain supercomputer. Maximum resolution. Finds patterns in chaos. Builds systems that don't exist yet. Runs extraordinarily hot. Requires real cooling to stay at peak.</div>
     </div>
   </div>
 
-  <!-- AI ADVANTAGE TABLE -->
-  <div class="section-header fade-in" style="padding-top:0;padding-bottom:24px">
-    <span class="section-tag tag-cyan">The AI-Era Advantage</span>
-    <h3 class="section-title" style="font-size:clamp(1.4rem,3.5vw,2rem)">Why This Brain Was Built for This Moment</h3>
+  <div class="sh fi" style="padding-top:0;padding-bottom:24px">
+    <span class="tag tag-c">The AI-Era Advantage</span>
+    <h2 style="font-size:clamp(1.6rem,4vw,2.5rem)">Why This Brain Was Built for This Exact Moment</h2>
   </div>
-  <div class="table-wrap fade-in">
+  <div class="tbl-wrap fi">
     <table>
-      <thead>
-        <tr>
-          <th>Autistic Cognitive Strength</th>
-          <th>AI / Tech Application</th>
-          <th>Real-World Output</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Cognitive Strength</th><th>AI / Tech Application</th><th>Real-World Output</th></tr></thead>
       <tbody>
-        <tr>
-          <td class="td-strength">Meticulous attention to detail</td>
-          <td class="td-app">Precision-critical AI model evaluation</td>
-          <td>Catches errors invisible to others</td>
-        </tr>
-        <tr>
-          <td class="td-strength">Hyper pattern recognition</td>
-          <td class="td-app">Machine learning, data architecture</td>
-          <td>Identifies system logic before the system is built</td>
-        </tr>
-        <tr>
-          <td class="td-strength">Hyperfocus / flow states</td>
-          <td class="td-app">Deep system building, long-form coding</td>
-          <td>10x output during focused periods</td>
-        </tr>
-        <tr>
-          <td class="td-strength">Unconventional problem-solving</td>
-          <td class="td-app">Novel algorithm design, first-of-its-kind systems</td>
-          <td>Building what doesn't exist yet</td>
-        </tr>
-        <tr>
-          <td class="td-strength">Systems thinking at depth</td>
-          <td class="td-app">Multi-layer platform architecture</td>
-          <td>Seeing all dependencies others miss</td>
-        </tr>
-        <tr>
-          <td class="td-strength">Extreme consistency &amp; methodical thinking</td>
-          <td class="td-app">QA, deployment pipeline integrity</td>
-          <td>Reliability that scales</td>
-        </tr>
+        <tr><td class="td-s">Meticulous attention to detail</td><td class="td-a">Precision AI evaluation &amp; debugging</td><td>Catches errors invisible to every other set of eyes</td></tr>
+        <tr><td class="td-s">Hyper pattern recognition</td><td class="td-a">ML architecture &amp; data structure design</td><td>Identifies system logic before the system is built</td></tr>
+        <tr><td class="td-s">Hyperfocus / deep flow states</td><td class="td-a">System building, long-form coding sessions</td><td>10× output during active focused periods</td></tr>
+        <tr><td class="td-s">Unconventional problem-solving</td><td class="td-a">First-of-its-kind algorithm &amp; product design</td><td>Building what has never existed — because only this brain sees it</td></tr>
+        <tr><td class="td-s">Systems thinking at full depth</td><td class="td-a">Multi-layer platform architecture</td><td>Sees all dependencies, failure points, and opportunities others miss entirely</td></tr>
+        <tr><td class="td-s">Extreme methodical consistency</td><td class="td-a">QA, deployment pipelines, compliance</td><td>Reliability that scales and holds under pressure</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 
-<div class="divider"></div>
+<div class="div" style="margin-bottom:0"></div>
 
-<!-- BURNOUT SECTION -->
-<section id="burnout">
-  <div class="section-header fade-in">
-    <span class="section-tag tag-pink">Part 03 — The Crash</span>
-    <h2 class="section-title">Autistic Burnout: This Is Real &amp; Medically Documented</h2>
-    <p class="section-desc">This is not weakness. Not laziness. Not depression. It is a clinically recognized syndrome — and it operates by different rules than anything the neurotypical world understands about "being tired."</p>
+<!-- BURNOUT -->
+<section id="burnout" class="sec">
+  <div class="sh fi">
+    <span class="tag tag-p">03 — The Crash</span>
+    <h2>Autistic Burnout: Real, Documented, Life-Altering</h2>
+    <p>This is not weakness. Not laziness. Not something to push through. It is a clinically recognized syndrome — and it operates by completely different rules than anything the neurotypical world understands about exhaustion.</p>
   </div>
 
-  <div class="timeline fade-in">
-    <div class="timeline-item" style="animation-delay:0.1s">
-      <div class="timeline-dot" style="background:var(--accent-pink);color:var(--accent-pink)"></div>
-      <div class="timeline-content">
-        <div class="timeline-step" style="color:var(--accent-pink)">Stage 01 — Accumulation</div>
-        <div class="timeline-title">The Invisible Load Builds</div>
-        <div class="timeline-desc">Autistic burnout doesn't come from one event. It is a cumulative stack: years of masking (performing neurotypicality), sensory overload, social demands, trust violations, and chronic environmental unpredictability. Each individual stressor seems manageable. The stack is not.</div>
+  <div class="timeline fi">
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--accent-pink);color:var(--accent-pink)"></div>
+      <div class="tl-box">
+        <div class="tl-step" style="color:var(--accent-pink)">Stage 01 — The Stack</div>
+        <div class="tl-h">The Invisible Load Accumulates</div>
+        <div class="tl-p">Autistic burnout is never one event. It is a cumulative stack: years of masking (performing neurotypicality), sensory overload, chronic social demands, trust violations, and relentless environmental unpredictability. Each layer seems survivable. The total stack is not.</div>
       </div>
     </div>
-    <div class="timeline-item" style="animation-delay:0.2s">
-      <div class="timeline-dot" style="background:var(--accent-violet);color:var(--accent-violet)"></div>
-      <div class="timeline-content">
-        <div class="timeline-step" style="color:var(--accent-violet)">Stage 02 — Threshold</div>
-        <div class="timeline-title">The System Hits Its Limit</div>
-        <div class="timeline-desc">The brain — a high-performance engine running at 100% — runs out of cooling. The result is not a simple slowdown. It is a system-wide collapse: pervasive exhaustion, loss of function, reduced tolerance to every stimulus, and paradoxically, the autism traits become MORE intense, not less.</div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--accent-violet);color:var(--accent-violet)"></div>
+      <div class="tl-box">
+        <div class="tl-step" style="color:var(--accent-violet)">Stage 02 — The Threshold</div>
+        <div class="tl-h">The System Hits Its Limit</div>
+        <div class="tl-p">The high-performance engine, running at 100% with no cooling, runs out. The result is not a simple slowdown. It is system-wide collapse: pervasive exhaustion, loss of function, reduced tolerance to every stimulus — and the autism traits become MORE intense, not less. Burnout amplifies, not mutes, the experience.</div>
       </div>
     </div>
-    <div class="timeline-item" style="animation-delay:0.3s">
-      <div class="timeline-dot" style="background:var(--accent-amber);color:var(--accent-amber)"></div>
-      <div class="timeline-content">
-        <div class="timeline-step" style="color:var(--accent-amber)">Stage 03 — The Recovery Paradox</div>
-        <div class="timeline-title">Recovery Requires Almost Nothing</div>
-        <div class="timeline-desc">Unlike depression — where doing more helps — autistic burnout demands extended sensory downtime and solitude. It takes days to rebuild the mental state needed to function at the necessary level. One interruption, one unexpected demand, one emotional disruption — resets the entire clock. Back to zero. This is not dramatic. This is documented clinical reality.</div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--accent-amber);color:var(--accent-amber)"></div>
+      <div class="tl-box">
+        <div class="tl-step" style="color:var(--accent-amber)">Stage 03 — The Paradox</div>
+        <div class="tl-h">Recovery Requires Almost Nothing</div>
+        <div class="tl-p">Unlike depression — where behavioral activation helps — autistic burnout demands extended sensory downtime, solitude, and protection from demands. Not rest in the lazy sense. Rest as the only available treatment. It takes days to rebuild the functional state needed to operate. One unexpected interruption resets the entire clock to zero. This is not dramatic. It is clinical fact.</div>
       </div>
     </div>
-    <div class="timeline-item" style="animation-delay:0.4s">
-      <div class="timeline-dot" style="background:var(--accent-blue);color:var(--accent-blue)"></div>
-      <div class="timeline-content">
-        <div class="timeline-step" style="color:var(--accent-blue)">Stage 04 — The Rebuild</div>
-        <div class="timeline-title">Days to Rebuild What One Word Can Destroy</div>
-        <div class="timeline-desc">After days of protected downtime, the right mental state returns — the one where obstacles look like hurdles to clear, not walls to collapse against. This state is fragile. It is critical. It is the only state from which the work that needs to happen can actually happen. Protecting it is not selfish. It is survival.</div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--accent-blue);color:var(--accent-blue)"></div>
+      <div class="tl-box">
+        <div class="tl-step" style="color:var(--accent-blue)">Stage 04 — The Rebuild</div>
+        <div class="tl-h">Days to Rebuild. Seconds to Lose.</div>
+        <div class="tl-p">After protected downtime, the right mental state returns — the one where obstacles are hurdles to clear, not walls to collapse against. This state is fragile and critical. It is the only state from which the necessary work can happen. A single unexpected social demand, emotional disruption, or urgent request can destroy it completely and restart the multi-day recovery cycle.</div>
       </div>
     </div>
-    <div class="timeline-item" style="animation-delay:0.5s">
-      <div class="timeline-dot" style="background:var(--accent-emerald);color:var(--accent-emerald)"></div>
-      <div class="timeline-content">
-        <div class="timeline-step" style="color:var(--accent-emerald)">Stage 05 — The Window</div>
-        <div class="timeline-title">The Moment Everything Is Possible</div>
-        <div class="timeline-desc">When the conditions are right — protected environment, no unexpected social demands, no interruptions — the hyper-processing engine turns back on. The same brain that was days ago barely functional becomes capable of outputs most people spend entire careers approaching. This is the window. Everything depends on keeping it open.</div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--accent-emerald);color:var(--accent-emerald)"></div>
+      <div class="tl-box">
+        <div class="tl-step" style="color:var(--accent-emerald)">Stage 05 — The Window</div>
+        <div class="tl-h">When Conditions Are Right, Everything Is Possible</div>
+        <div class="tl-p">When the environment is protected — no unexpected social demands, no interruptions, no obligations — the hyper-processing engine fully restores. The same brain that was barely functional days ago becomes capable of outputs most people never approach in entire careers. This window is everything. Everything depends on keeping it open.</div>
       </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- BODY SECTION -->
-<section id="body">
-  <div class="section-header fade-in">
-    <span class="section-tag tag-amber">Part 04 — The Body</span>
-    <h2 class="section-title">The Brain &amp; Body Are Not Separate</h2>
-    <p class="section-desc">The physical symptoms are directly downstream of the neurological state. This is not psychosomatic. This is cascade physiology — documented, researched, and directly correlated.</p>
-  </div>
-
-  <div class="body-grid fade-in">
-    <div class="body-card" style="border-color:rgba(239,68,68,0.25)">
-      <span class="body-card-icon">❤️</span>
-      <div class="body-card-name" style="color:#ef4444">Cardiomegaly</div>
-      <div class="body-card-link">~73% of autistic adults carry at least one major cardiovascular risk factor. Chronic stress, elevated cortisol, and poor sleep directly strain heart muscle over years. NIH-confirmed.</div>
-    </div>
-    <div class="body-card" style="border-color:rgba(245,158,11,0.25)">
-      <span class="body-card-icon">🫁</span>
-      <div class="body-card-name" style="color:var(--accent-amber)">Kidney Stress</div>
-      <div class="body-card-link">Chronic cortisol elevation from sustained stress impairs renal filtration over time. The adrenal-kidney axis is directly impacted by long-term neurological overload.</div>
-    </div>
-    <div class="body-card" style="border-color:rgba(124,58,237,0.25)">
-      <span class="body-card-icon">🦴</span>
-      <div class="body-card-name" style="color:var(--accent-violet)">Back &amp; Spine</div>
-      <div class="body-card-link">Chronic muscle tension from sustained stress states, combined with sedentary deep-focus work postures, creates long-term musculoskeletal compression and pain.</div>
-    </div>
-    <div class="body-card" style="border-color:rgba(6,182,212,0.25)">
-      <span class="body-card-icon">🧠</span>
-      <div class="body-card-name" style="color:var(--accent-cyan)">Cognitive Bruising</div>
-      <div class="body-card-link">The brain is a muscle. Like muscles, it can be bruised by over-exertion. Unlike physical bruises, cognitive bruising isn't visible — but its effects on function are just as real and just as recovery-dependent.</div>
-    </div>
-    <div class="body-card" style="border-color:rgba(16,185,129,0.25)">
-      <span class="body-card-icon">😴</span>
-      <div class="body-card-name" style="color:var(--accent-emerald)">Sleep Architecture</div>
-      <div class="body-card-link">Autistic nervous systems process more during sleep to compensate for daytime overload. Disrupted sleep doesn't just cause tiredness — it collapses the entire recovery system.</div>
-    </div>
-    <div class="body-card" style="border-color:rgba(236,72,153,0.25)">
-      <span class="body-card-icon">⚡</span>
-      <div class="body-card-name" style="color:var(--accent-pink)">Nervous System</div>
-      <div class="body-card-link">The autonomic nervous system is chronically dysregulated in burnout. The sympathetic fight-or-flight state stays active far longer than in neurotypical burnout, compounding every physical symptom present.</div>
-    </div>
-  </div>
-
-  <div class="quote-block fade-in">
-    <div class="quote-inner" style="background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(239,68,68,0.06));border-color:rgba(245,158,11,0.2)">
-      <p class="quote-text">"These are not separate problems. The heart, kidneys, back — these are one problem with multiple physical expressions. That problem is sustained, severe, unrelieved stress on a nervous system that was already processing everything at maximum intensity."</p>
-      <p class="quote-attr">— Synthesized from NIH/PMC, Autism &amp; Cardiovascular Research</p>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
+<div class="div" style="margin-bottom:0"></div>
+
+<!-- BODY -->
+<section id="body" class="sec">
+  <div class="sh fi">
+    <span class="tag tag-a">04 — The Body</span>
+    <h2>The Brain &amp; Body Are One System</h2>
+    <p>The physical symptoms are directly downstream of the neurological state. Not psychosomatic — cascade physiology. Each physical condition is traceable back to a single source: sustained, severe, unrelieved stress on a nervous system already processing everything at maximum intensity.</p>
+  </div>
+
+  <div class="body-grid fi">
+    <div class="bc" style="border-color:rgba(244,63,94,0.3)"><span class="bc-ico">❤️</span><div class="bc-name" style="color:var(--accent-rose)">Cardiomegaly</div><div class="bc-txt">~73% of autistic adults carry at least one major cardiovascular risk factor. Chronic cortisol elevation and disrupted sleep architecture directly strain heart muscle over years — not metaphorically, clinically.</div></div>
+    <div class="bc" style="border-color:rgba(245,158,11,0.3)"><span class="bc-ico">🫁</span><div class="bc-name" style="color:var(--accent-amber)">Kidney Stress</div><div class="bc-txt">The adrenal-kidney axis is directly impacted by long-term neurological overload. Sustained cortisol elevation impairs renal filtration over time, compounding every other physical stress present.</div></div>
+    <div class="bc" style="border-color:rgba(124,58,237,0.3)"><span class="bc-ico">🦴</span><div class="bc-name" style="color:var(--accent-violet)">Back &amp; Spine</div><div class="bc-txt">Chronic muscle tension from sustained stress states, combined with deep-focus sedentary work postures held for hours, creates long-term musculoskeletal compression that compounds over months and years.</div></div>
+    <div class="bc" style="border-color:rgba(6,182,212,0.3)"><span class="bc-ico">🧠</span><div class="bc-name" style="color:var(--accent-cyan)">Cognitive Bruising</div><div class="bc-txt">The brain is a biological organ. Like muscle tissue, it can be damaged by over-exertion. Unlike physical bruises, cognitive bruising has no visible mark — but its effects on function, recovery time, and capacity are just as real.</div></div>
+    <div class="bc" style="border-color:rgba(16,185,129,0.3)"><span class="bc-ico">😴</span><div class="bc-name" style="color:var(--accent-emerald)">Sleep Architecture</div><div class="bc-txt">The autistic nervous system processes more during sleep to compensate for daytime overload. Disrupted sleep doesn't just create tiredness — it collapses the entire physiological recovery cascade that everything else depends on.</div></div>
+    <div class="bc" style="border-color:rgba(236,72,153,0.3)"><span class="bc-ico">⚡</span><div class="bc-name" style="color:var(--accent-pink)">Nervous System</div><div class="bc-txt">The autonomic system is chronically dysregulated in burnout — the sympathetic fight-or-flight state stays active far longer than normal, compounding every physical symptom simultaneously and exponentially.</div></div>
+  </div>
+
+  <div class="quote fi">
+    <div class="quote-in" style="background:linear-gradient(135deg,rgba(245,158,11,0.07),rgba(244,63,94,0.05));border:1px solid rgba(245,158,11,0.2)">
+      <blockquote>"These are not separate problems. The heart, kidneys, back — these are one problem with multiple physical expressions. The problem is sustained, severe, unrelieved stress on a nervous system that was already processing everything at maximum intensity."</blockquote>
+      <cite>— Synthesized from NIH/PMC Cardiovascular &amp; Autism Research</cite>
+    </div>
+  </div>
+</section>
+
+<div class="div" style="margin-bottom:0"></div>
 
 <!-- GENIUSES -->
-<section id="geniuses">
-  <div class="section-header fade-in">
-    <span class="section-tag tag-emerald">Part 05 — Historical Proof</span>
-    <h2 class="section-title">The Pattern Is Consistent Across History</h2>
-    <p class="section-desc">The same cognitive architecture that enables extraordinary insight makes ordinary social navigation extraordinarily costly. Every time. Without exception.</p>
+<section id="geniuses" class="sec">
+  <div class="sh fi">
+    <span class="tag tag-e">05 — Historical Proof</span>
+    <h2>The Pattern Is Consistent Across All of History</h2>
+    <p>The same cognitive architecture that enables extraordinary insight makes ordinary social navigation extraordinarily costly. Every time. Without exception. The world eventually catches up to what these minds built.</p>
   </div>
 
-  <div class="geniuses-grid fade-in">
-    <div class="genius-card">
-      <span class="genius-avatar">🌌</span>
-      <div class="genius-name">Albert Einstein</div>
-      <div class="genius-trait">Considered a poor student. Thought in visual-spatial maps, not words. Restructured humanity's understanding of space, time, and energy.</div>
-      <span class="genius-badge">Physics</span>
-    </div>
-    <div class="genius-card">
-      <span class="genius-avatar">⚡</span>
-      <div class="genius-name">Nikola Tesla</div>
-      <div class="genius-trait">Worked alone, obsessively, in ways contemporaries couldn't follow. Died broke. His inventions power the modern world.</div>
-      <span class="genius-badge">Engineering</span>
-    </div>
-    <div class="genius-card">
-      <span class="genius-avatar">💻</span>
-      <div class="genius-name">Alan Turing</div>
-      <div class="genius-trait">Isolated. Misunderstood. Prosecuted. Invented the foundational theory of all modern computing.</div>
-      <span class="genius-badge">Computing</span>
-    </div>
-    <div class="genius-card">
-      <span class="genius-avatar">🐄</span>
-      <div class="genius-name">Temple Grandin</div>
-      <div class="genius-title">Told she'd never function independently. Used autistic sensory insight to design livestock systems no neurotypical engineer conceived.</div>
-      <span class="genius-badge">Systems Design</span>
-    </div>
-    <div class="genius-card">
-      <span class="genius-avatar">🎵</span>
-      <div class="genius-name">Daniel Tammet</div>
-      <div class="genius-trait">Learns a new language in days. Recited Pi to 22,514 decimal places. Sees numbers as shapes, colors, textures.</div>
-      <span class="genius-badge">Memory / Math</span>
-    </div>
-    <div class="genius-card">
-      <span class="genius-avatar">🏙️</span>
-      <div class="genius-name">Stephen Wiltshire</div>
-      <div class="genius-trait">Draws entire city skylines from memory after a single helicopter flyover — with architectural precision down to individual windows.</div>
-      <span class="genius-badge">Visual Art</span>
-    </div>
+  <div class="genius-grid fi">
+    <div class="genius-card"><span class="genius-emo">🌌</span><div class="genius-name">Albert Einstein</div><div class="genius-text">Considered an unremarkable student. Thought entirely in visual-spatial maps. Restructured humanity's fundamental understanding of space, time, and the nature of reality.</div><span class="genius-tag">Physics</span></div>
+    <div class="genius-card"><span class="genius-emo">⚡</span><div class="genius-name">Nikola Tesla</div><div class="genius-text">Worked alone, obsessively, in ways no contemporary could follow. Died broke and isolated. His inventions power the entire modern world — still.</div><span class="genius-tag">Engineering</span></div>
+    <div class="genius-card"><span class="genius-emo">💻</span><div class="genius-name">Alan Turing</div><div class="genius-text">Isolated, misunderstood, criminalized by the society he saved. Invented the foundational mathematical theory underlying all modern computing and AI.</div><span class="genius-tag">Computing</span></div>
+    <div class="genius-card"><span class="genius-emo">🐄</span><div class="genius-name">Temple Grandin</div><div class="genius-text">Told as a child she would never function independently. Used autistic sensory insight to engineer livestock systems no neurotypical mind conceived.</div><span class="genius-tag">Systems</span></div>
+    <div class="genius-card"><span class="genius-emo">🎵</span><div class="genius-name">Daniel Tammet</div><div class="genius-text">Learns languages in days. Recited Pi to 22,514 decimal places. Experiences numbers as shapes, colors, and textures in a private visual universe.</div><span class="genius-tag">Memory</span></div>
+    <div class="genius-card"><span class="genius-emo">🏙️</span><div class="genius-name">Stephen Wiltshire</div><div class="genius-text">Draws entire city skylines from memory after a single helicopter flyover — architectural precision down to individual windows, streets, and shadows.</div><span class="genius-tag">Visual Art</span></div>
   </div>
 
-  <div class="quote-block fade-in">
-    <div class="quote-inner" style="background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(6,182,212,0.06));border-color:rgba(16,185,129,0.2)">
-      <p class="quote-text">"The outsider perspective, the refusal to assume the existing framework is correct, the willingness to build from completely new premises — these are not symptoms of dysfunction. They are the engine of every genuine breakthrough that has ever happened."</p>
-      <p class="quote-attr">— The Innovation Context</p>
+  <div class="quote fi">
+    <div class="quote-in" style="background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(6,182,212,0.05));border:1px solid rgba(16,185,129,0.2)">
+      <blockquote>"The refusal to assume the existing framework is correct. The willingness to build from first principles. The outsider perspective that sees what everyone else has normalized into invisibility. These are not symptoms of dysfunction. They are the engine of every genuine breakthrough that has ever happened."</blockquote>
+      <cite>— The Innovation Context</cite>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
+<div class="div" style="margin-bottom:0"></div>
 
 <!-- LOVED ONES -->
-<section id="loved-ones">
-  <div class="section-header fade-in">
-    <span class="section-tag tag-blue">Part 06 — For Loved Ones</span>
-    <h2 class="section-title">What Helps. What Hurts. No Guessing.</h2>
-    <p class="section-desc">This is not a criticism. It is a map. The difference between helping and hurting is often invisible from the outside — so here it is, made visible.</p>
+<section id="loved-ones" class="sec">
+  <div class="sh fi">
+    <span class="tag tag-b">06 — For Loved Ones</span>
+    <h2>What Helps. What Hurts.<br/>No Ambiguity Left.</h2>
+    <p>This is not criticism. It is a map. The difference between supporting and inadvertently harming is often completely invisible from the outside — so here it is, made visible and explicit.</p>
   </div>
 
-  <div class="hh-grid fade-in">
-    <div class="hh-card helps">
-      <div class="hh-title" style="color:var(--accent-emerald)">
-        <span>✅</span> What Genuinely Helps
-      </div>
+  <div class="hh-grid fi">
+    <div class="hh-card hh-helps">
+      <div class="hh-title" style="color:var(--accent-emerald)"><span>✅</span> What Genuinely Helps</div>
       <ul class="hh-list">
-        <li>Reading and acknowledging written communication as the real conversation</li>
-        <li>Reducing environmental demands and unexpected interruptions</li>
-        <li>Trusting "I'm working on it" without requiring status updates</li>
-        <li>Accepting the pace of recovery without expressing frustration</li>
-        <li>Providing a predictable, low-stimulus environment</li>
-        <li>Acknowledging the extraordinary nature of what's being built</li>
-        <li>Understanding that silence is not distance — it is work</li>
-        <li>Not taking the communication style personally</li>
+        <li><span class="hh-icon helps-icon">✓</span>Receiving written communication as the real, complete conversation — not a preview of a "real" one</li>
+        <li><span class="hh-icon helps-icon">✓</span>Reducing unexpected interruptions, demands, and obligations</li>
+        <li><span class="hh-icon helps-icon">✓</span>Trusting "I'm on it" without requiring status updates or check-ins</li>
+        <li><span class="hh-icon helps-icon">✓</span>Accepting the recovery pace without expressing frustration or impatience</li>
+        <li><span class="hh-icon helps-icon">✓</span>Providing a predictable, low-stimulus environment when possible</li>
+        <li><span class="hh-icon helps-icon">✓</span>Acknowledging the complexity and scale of what's being built</li>
+        <li><span class="hh-icon helps-icon">✓</span>Understanding that silence is not distance — it is the work</li>
+        <li><span class="hh-icon helps-icon">✓</span>Not taking the communication style personally, ever</li>
       </ul>
     </div>
-    <div class="hh-card hurts">
-      <div class="hh-title" style="color:#ef4444">
-        <span>🚫</span> What Resets the Clock
-      </div>
+    <div class="hh-card hh-hurts">
+      <div class="hh-title" style="color:var(--accent-rose)"><span>🚫</span> What Resets the Clock</div>
       <ul class="hh-list">
-        <li>Pushing for verbal or in-person discussion when written is what's available</li>
-        <li>Adding tasks, questions, or obligations to an already overloaded system</li>
-        <li>Expressing frustration at the pace or style of communication</li>
-        <li>Offering unsolicited advice or alternative coping strategies</li>
-        <li>Unexpected visits, calls, or emotional escalations</li>
-        <li>Minimizing the complexity of the work happening</li>
-        <li>Making decisions or assumptions based on silence = bad news</li>
-        <li>Interpreting the need for space as rejection</li>
+        <li><span class="hh-icon hurts-icon">✕</span>Pushing for verbal or in-person discussion when this written form is all that's available</li>
+        <li><span class="hh-icon hurts-icon">✕</span>Adding tasks, questions, or obligations to an already overloaded system</li>
+        <li><span class="hh-icon hurts-icon">✕</span>Expressing frustration at the pace or style of communication</li>
+        <li><span class="hh-icon hurts-icon">✕</span>Offering unsolicited advice or alternative strategies</li>
+        <li><span class="hh-icon hurts-icon">✕</span>Unexpected visits, calls, or emotional escalations</li>
+        <li><span class="hh-icon hurts-icon">✕</span>Minimizing, normalizing, or simplifying the complexity of the work</li>
+        <li><span class="hh-icon hurts-icon">✕</span>Interpreting silence or space as a bad sign</li>
+        <li><span class="hh-icon hurts-icon">✕</span>Making assumptions or decisions based on incomplete information</li>
       </ul>
     </div>
   </div>
 
-  <div class="section-header fade-in" style="padding-bottom:24px">
-    <h3 class="section-title" style="font-size:clamp(1.3rem,3vw,1.8rem)">The Communication Gap Is Structural, Not Personal</h3>
-    <p class="section-desc">Many autistic individuals think and communicate far more clearly in writing than in spoken conversation — where social demands, real-time processing requirements, and sensory input all compound simultaneously. Reading this document carefully is the equivalent of a three-hour conversation. It counts. It is real.</p>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- SOCRATES / INNOVATION CONTEXT -->
-<section id="innovation">
-  <div class="section-header fade-in">
-    <span class="section-tag tag-violet">Part 07 — The Work</span>
-    <h2 class="section-title">Building What Has Never Been Built</h2>
-    <p class="section-desc">There is no manual for this. When the territory has never been mapped, the map-maker has to work differently than everyone else — and looks, from the outside, like they don't know what they're doing.</p>
-  </div>
-
-  <div class="cards-grid fade-in">
-    <div class="card" style="grid-column: span 1;">
-      <div class="card-accent" style="background:var(--accent-violet)"></div>
-      <span class="card-icon" style="color:var(--accent-violet)">🌀</span>
-      <div class="card-title">"I Know That I Know Nothing"</div>
-      <div class="card-desc">Socrates' most powerful insight isn't self-deprecation — it is the first principle of every genuine breakthrough. When you don't assume the existing framework is correct, you can build frameworks that don't exist yet. That is exactly what is happening here.</div>
-    </div>
-    <div class="card" style="grid-column: span 1;">
-      <div class="card-accent" style="background:var(--accent-cyan)"></div>
-      <span class="card-icon" style="color:var(--accent-cyan)">🚀</span>
-      <div class="card-title">The AI Landscape Shifts Daily</div>
-      <div class="card-desc">By the time anyone reads this, 100 things in the AI world will have changed. Keeping pace with regulatory shifts, model releases, compliance updates, and competitive threats while simultaneously building — this is a load that would be extreme for any founder. For a brain in burnout, it is extraordinary.</div>
-    </div>
-    <div class="card" style="grid-column: span 1;">
-      <div class="card-accent" style="background:var(--accent-amber)"></div>
-      <span class="card-icon" style="color:var(--accent-amber)">⚠️</span>
-      <div class="card-title">The Collaboration Trap</div>
-      <div class="card-desc">Autistic founders often face a documented pattern: high-trust delegation that fails catastrophically, followed by bad-faith collaborators leveraging legal threats or emotional manipulation to claim what they didn't build. Recognizing this and adjusting is not paranoia. It is rational strategy based on demonstrated evidence.</div>
+  <div class="quote fi">
+    <div class="quote-in" style="background:linear-gradient(135deg,rgba(59,130,246,0.07),rgba(6,182,212,0.05));border:1px solid rgba(59,130,246,0.2)">
+      <blockquote>"Reading this document carefully is the equivalent of a long, honest, complete conversation. It is not a substitute for connection — it IS the connection, in the language that works. Honoring that is everything."</blockquote>
+      <cite>— The Communication Gap Is Structural, Not Personal</cite>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
+<div class="div" style="margin-bottom:0"></div>
 
 <!-- CLOSING -->
 <section id="closing">
-  <div class="closing-glow"></div>
-  <div style="position:relative;z-index:2">
-    <div class="section-tag tag-pink" style="display:inline-block;margin-bottom:24px">The Ask</div>
-    <h2 class="closing-title">Not Money.<br/>Not Intervention.<br/>Understanding.</h2>
-    <p class="closing-desc">
-      The brain that wrote this is extraordinary. It is also exhausted, over-stressed, and operating in conditions that would bring any system to its knees. The only ask is understanding — real, patient, informed understanding — and the space to operate the way this specific mind needs to operate in order to get through this window, survive the obstacles, and build what it was built to build.
-    </p>
-    <div style="max-width:700px;margin:0 auto 48px;padding:32px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:20px;font-size:0.95rem;color:var(--text-secondary);line-height:1.85;text-align:left;">
-      <strong style="color:var(--text-primary);display:block;margin-bottom:12px;font-family:'Space Grotesk',sans-serif;">The Socratic starting point is the honest one.</strong>
-      Knowing that you know nothing means the assumptions aren't locked in. The framework is still being written. The most important things are still ahead. That is not a confession of failure. It is the first principle of every genuine breakthrough that has ever happened — and it is exactly where this stands right now.
+  <div class="closing-nebula"></div>
+  <div style="position:relative;z-index:2;">
+    <span class="closing-eyebrow">The Only Ask</span>
+    <h2 class="closing-h">
+      Not Intervention.<br/>
+      Not Rescue.<br/>
+      Understanding.
+    </h2>
+    <div class="closing-manifesto fi">
+      <p class="big-line">The brain that wrote this is extraordinary. It is also exhausted, over-stressed, and operating in conditions that would bring any system to its knees — and it is still building something that has never existed before.</p>
+      <p>The ask is not resources. It is not a solution. It is <strong>space</strong> — real, protected, uninterrupted space to operate the way this specific mind needs to operate in order to get through this window, survive the obstacles in front of it, and build what it was built to build.</p>
+      <p>The Socratic admission — <em>"I know that I know nothing"</em> — is not self-deprecation. It is the most honest, accurate description of what it means to build in a domain where the ground shifts faster than maps can be made. It is also the disposition of every single significant innovator in history. Assumptions not locked in. Framework still being written. The most important work still ahead.</p>
+      <p><strong>The only ask is this: understand what you've just read. Trust it. And hold the space for what it takes to be this kind of mind — especially right now.</strong></p>
     </div>
-    <div class="closing-cta">
-      <a href="#preface" class="btn btn-primary">↑ Read Again From the Top</a>
-      <a href="#loved-ones" class="btn btn-ghost">For Loved Ones →</a>
+    <div class="btn-row">
+      <a href="#preface" class="btn btn-pri">↑ Read From the Beginning</a>
+      <a href="#loved-ones" class="btn btn-sec">For Loved Ones →</a>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>Built with the only language available right now — and that's enough. &nbsp;·&nbsp; Nirmata Holdings &nbsp;·&nbsp; June 2026</p>
-  <p style="margin-top:8px;font-size:0.7rem;opacity:0.4">Research: NIH/PMC · Intense World Theory · SSM Health Treffert Center · Autism Spectrum News · Forbes · Child Mind Institute · Vanderbilt Autism &amp; Innovation Center</p>
+  <p>Built in the only language available right now — and that is enough.</p>
+  <p>Nirmata Holdings · June 2026</p>
+  <p style="margin-top:8px;opacity:0.4;font-size:0.65rem">Research: NIH/PMC · Intense World Theory (Markram, 2010) · SSM Health Treffert Center · Autism Spectrum News · Forbes · Child Mind Institute · Vanderbilt Autism &amp; Innovation Center</p>
 </footer>
 
 <script>
-// ── STAR FIELD ──────────────────────────────────────────
-const canvas = document.getElementById('stars');
-const ctx = canvas.getContext('2d');
-let stars = [];
-let W, H;
+// ── CANVAS PARTICLE SYSTEM ──────────────────────────────
+const C = document.getElementById('canvas-bg');
+const cx = C.getContext('2d');
+let W, H, particles = [], nebulae = [];
 
 function resize() {
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
+  W = C.width = window.innerWidth;
+  H = C.height = window.innerHeight;
 }
 resize();
-window.addEventListener('resize', resize);
+window.addEventListener('resize', resize, {passive:true});
 
-function initStars() {
-  stars = [];
-  for (let i = 0; i < 180; i++) {
-    stars.push({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      r: Math.random() * 1.5 + 0.3,
-      o: Math.random() * 0.6 + 0.1,
-      s: Math.random() * 0.3 + 0.05,
-      dir: Math.random() > 0.5 ? 1 : -1
-    });
-  }
+// Stars
+for (let i = 0; i < 220; i++) {
+  particles.push({
+    x: Math.random() * 1920, y: Math.random() * 1080,
+    r: Math.random() * 1.8 + 0.2,
+    o: Math.random() * 0.7 + 0.05,
+    s: Math.random() * 0.4 + 0.05,
+    d: Math.random() > 0.5 ? 1 : -1,
+    vx: (Math.random() - 0.5) * 0.08,
+    vy: (Math.random() - 0.5) * 0.08,
+    hue: Math.random() > 0.8 ? 280 : (Math.random() > 0.5 ? 210 : 190)
+  });
 }
-initStars();
 
-function drawStars() {
-  ctx.clearRect(0, 0, W, H);
-  stars.forEach(s => {
-    s.o += s.s * s.dir * 0.01;
-    if (s.o > 0.8 || s.o < 0.05) s.dir *= -1;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(180,200,255,${s.o})`;
-    ctx.fill();
+// Nebula orbs
+const nebulaColors = [
+  'rgba(124,58,237,0.04)', 'rgba(59,130,246,0.04)',
+  'rgba(6,182,212,0.03)', 'rgba(236,72,153,0.025)'
+];
+for (let i = 0; i < 6; i++) {
+  nebulae.push({
+    x: Math.random() * 1920, y: Math.random() * 1080,
+    r: 200 + Math.random() * 400,
+    vx: (Math.random() - 0.5) * 0.15,
+    vy: (Math.random() - 0.5) * 0.15,
+    col: nebulaColors[i % nebulaColors.length]
   });
-  requestAnimationFrame(drawStars);
 }
-drawStars();
 
-// ── INTERSECTION OBSERVER (fade-in) ─────────────────────
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-    }
+// Mouse parallax
+let mx = W/2, my = H/2;
+window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
+
+// Shooting stars
+let shooters = [];
+function spawnShooter() {
+  shooters.push({
+    x: Math.random() * W, y: Math.random() * H * 0.5,
+    vx: 3 + Math.random() * 4, vy: 1.5 + Math.random() * 2,
+    len: 80 + Math.random() * 120, life: 1, decay: 0.02 + Math.random() * 0.02
   });
-}, { threshold: 0.1 });
+}
+setInterval(spawnShooter, 3500);
 
-document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+function draw(ts) {
+  cx.clearRect(0, 0, W, H);
 
-// ── TIMELINE ANIMATION ───────────────────────────────────
-const tlObserver = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.style.opacity = '1';
-      e.target.style.transform = 'translateY(0)';
-    }
+  // Nebulae
+  nebulae.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < -n.r) n.x = W + n.r;
+    if (n.x > W + n.r) n.x = -n.r;
+    if (n.y < -n.r) n.y = H + n.r;
+    if (n.y > H + n.r) n.y = -n.r;
+    const g = cx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+    g.addColorStop(0, n.col);
+    g.addColorStop(1, 'transparent');
+    cx.fillStyle = g;
+    cx.beginPath();
+    cx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+    cx.fill();
   });
-}, { threshold: 0.2 });
 
-document.querySelectorAll('.timeline-item').forEach((el, i) => {
-  el.style.transform = 'translateY(30px)';
-  el.style.transition = `opacity 0.6s ease ${i * 0.15}s, transform 0.6s ease ${i * 0.15}s`;
-  tlObserver.observe(el);
-});
+  // Stars
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+    p.o += p.s * p.d * 0.008;
+    if (p.o > 0.85 || p.o < 0.02) p.d *= -1;
+    cx.beginPath();
+    cx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    cx.fillStyle = `hsla(${p.hue},80%,90%,${p.o})`;
+    cx.fill();
+  });
 
-// ── SMOOTH NAV ACTIVE STATE ──────────────────────────────
-const sections = document.querySelectorAll('section[id]');
-const navLinks = document.querySelectorAll('.nav-links a');
+  // Shooting stars
+  shooters = shooters.filter(s => s.life > 0);
+  shooters.forEach(s => {
+    s.x += s.vx; s.y += s.vy; s.life -= s.decay;
+    const g = cx.createLinearGradient(s.x, s.y, s.x - s.vx * s.len/s.vx, s.y - s.vy * s.len/s.vx);
+    g.addColorStop(0, `rgba(200,210,255,${s.life * 0.7})`);
+    g.addColorStop(1, 'transparent');
+    cx.beginPath();
+    cx.moveTo(s.x, s.y);
+    cx.lineTo(s.x - s.vx*(s.len/s.vx), s.y - s.vy*(s.len/s.vx));
+    cx.strokeStyle = g;
+    cx.lineWidth = 1.5;
+    cx.stroke();
+  });
 
-window.addEventListener('scroll', () => {
-  let current = '';
-  sections.forEach(s => {
-    if (window.scrollY >= s.offsetTop - 100) current = s.id;
-  });
-  navLinks.forEach(a => {
-    a.style.color = '';
-    if (a.getAttribute('href') === '#' + current) {
-      a.style.color = 'var(--accent-cyan)';
-    }
-  });
-}, { passive: true });
-
-// ── CARD MICRO-INTERACTIONS ──────────────────────────────
-document.querySelectorAll('.card').forEach(card => {
-  card.addEventListener('mousemove', (e) => {
-    const rect = card.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 10;
-    card.style.transform = `translateY(-4px) rotateX(${-y}deg) rotateY(${x}deg)`;
-  });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = '';
-  });
-});
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
 
 // ── PROGRESS BAR ────────────────────────────────────────
-const bar = document.createElement('div');
-bar.style.cssText = 'position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent-blue),var(--accent-violet),var(--accent-pink));z-index:9999;transition:width 0.1s;width:0%';
-document.body.appendChild(bar);
+const prog = document.getElementById('progress');
 window.addEventListener('scroll', () => {
-  const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-  bar.style.width = pct + '%';
-}, { passive: true });
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  prog.style.width = pct + '%';
+}, {passive:true});
+
+// ── INTERSECTION OBSERVER ────────────────────────────────
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, {threshold: 0.1});
+document.querySelectorAll('.fi').forEach(el => io.observe(el));
+
+// Timeline items
+const tlio = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, {threshold: 0.15});
+document.querySelectorAll('.tl-item').forEach((el,i) => {
+  el.style.transitionDelay = `${i * 0.12}s`;
+  tlio.observe(el);
+});
+
+// ── 3D CARD TILT ─────────────────────────────────────────
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+    card.style.transform = `translateY(-5px) rotateX(${(0.5-y)*12}deg) rotateY(${(x-0.5)*12}deg)`;
+    card.style.setProperty('--mx', (x*100)+'%');
+    card.style.setProperty('--my', (y*100)+'%');
+  });
+  card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+});
+
+// ── NAV ACTIVE ───────────────────────────────────────────
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id; });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#'+cur);
+  });
+}, {passive:true});
+
+// ── GENIUS CARD HOVER GLOW ───────────────────────────────
+const colors = ['#3b82f6','#7c3aed','#06b6d4','#10b981','#f59e0b','#ec4899'];
+document.querySelectorAll('.genius-card').forEach((c,i) => {
+  c.addEventListener('mouseenter', () => {
+    c.style.boxShadow = `0 24px 60px rgba(0,0,0,0.5), 0 0 40px ${colors[i%colors.length]}22`;
+    c.style.borderColor = colors[i%colors.length]+'44';
+  });
+  c.addEventListener('mouseleave', () => {
+    c.style.boxShadow = '';
+    c.style.borderColor = '';
+  });
+});
 </script>
 </body>
 </html>
